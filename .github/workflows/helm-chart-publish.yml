@@ -47,7 +47,7 @@ jobs:
       - name: Push Helm chart to OCI registry
         run: |
           CHART_PACKAGE=$(ls spring-playground-*.tgz)
-          helm push ${CHART_PACKAGE} oci://ghcr.io/${{ github.repository_owner }}
+          helm push ${CHART_PACKAGE} oci://ghcr.io/${{ github.repository }}/chart
           echo "Pushed chart: ${CHART_PACKAGE}"
 
       - name: Logout from registry
