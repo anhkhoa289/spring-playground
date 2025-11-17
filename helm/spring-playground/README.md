@@ -30,13 +30,13 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 
 # Install the chart from OCI registry
-helm install spring-playground oci://ghcr.io/anhkhoa289/spring-playground --version 1.0.0
+helm install spring-playground oci://ghcr.io/anhkhoa289/spring-playground/chart --version 1.0.0
 
 # Install with custom values
-helm install spring-playground oci://ghcr.io/anhkhoa289/spring-playground --version 1.0.0 -f custom-values.yaml
+helm install spring-playground oci://ghcr.io/anhkhoa289/spring-playground/chart --version 1.0.0 -f custom-values.yaml
 
 # Install in a specific namespace
-helm install spring-playground oci://ghcr.io/anhkhoa289/spring-playground --version 1.0.0 -n spring-playground --create-namespace
+helm install spring-playground oci://ghcr.io/anhkhoa289/spring-playground/chart --version 1.0.0 -n spring-playground --create-namespace
 ```
 
 **Note:** If the repository is private, you need to login first:
@@ -65,7 +65,7 @@ helm install spring-playground ./helm/spring-playground -n spring-playground --c
 
 From OCI registry:
 ```bash
-helm upgrade spring-playground oci://ghcr.io/anhkhoa289/spring-playground --version 1.1.0
+helm upgrade spring-playground oci://ghcr.io/anhkhoa289/spring-playground/chart --version 1.1.0
 ```
 
 From local source:
@@ -175,7 +175,7 @@ To publish a new version of the Helm chart to the OCI registry:
 3. GitHub Actions will automatically:
    - Update the chart version in `Chart.yaml`
    - Package the Helm chart
-   - Push it to `ghcr.io/anhkhoa289/spring-playground`
+   - Push it to `oci://ghcr.io/anhkhoa289/spring-playground/chart`
 
 ## Notes
 
