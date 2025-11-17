@@ -4,7 +4,7 @@ Dự án Spring Boot 3 với Spring MVC, Spring Data JPA, PostgreSQL và Hazelca
 
 ## Công nghệ sử dụng
 
-- **Spring Boot 3.2.0**
+- **Spring Boot 3.5.7**
 - **Java 17**
 - **Spring MVC** - REST API
 - **Spring Data JPA** - ORM
