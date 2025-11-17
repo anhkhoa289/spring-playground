@@ -20,16 +20,37 @@ Helm chart for deploying the Spring Boot Playground application to Kubernetes.
 
 ## Installation
 
-### Add Bitnami repository (for PostgreSQL dependency)
+### Option 1: Install from OCI Registry (Recommended)
+
+The Helm chart is automatically published to GitHub Container Registry (GHCR) as an OCI artifact when a tag matching `v*.*.*-chart` is pushed.
 
 ```bash
+# Add Bitnami repository (for PostgreSQL dependency)
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
+
+# Install the chart from OCI registry
+helm install spring-playground oci://ghcr.io/anhkhoa289/spring-playground --version 1.0.0
+
+# Install with custom values
+helm install spring-playground oci://ghcr.io/anhkhoa289/spring-playground --version 1.0.0 -f custom-values.yaml
+
+# Install in a specific namespace
+helm install spring-playground oci://ghcr.io/anhkhoa289/spring-playground --version 1.0.0 -n spring-playground --create-namespace
 ```
 
-### Install the chart
+**Note:** If the repository is private, you need to login first:
+```bash
+echo $GITHUB_TOKEN | helm registry login ghcr.io -u USERNAME --password-stdin
+```
+
+### Option 2: Install from Local Source
 
 ```bash
+# Add Bitnami repository (for PostgreSQL dependency)
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
 # Install with default values
 helm install spring-playground ./helm/spring-playground
 
@@ -42,6 +63,12 @@ helm install spring-playground ./helm/spring-playground -n spring-playground --c
 
 ## Upgrading
 
+From OCI registry:
+```bash
+helm upgrade spring-playground oci://ghcr.io/anhkhoa289/spring-playground --version 1.1.0
+```
+
+From local source:
 ```bash
 helm upgrade spring-playground ./helm/spring-playground
 ```
@@ -135,10 +162,27 @@ Validate the chart:
 helm lint ./helm/spring-playground
 ```
 
+## Releasing New Chart Versions
+
+To publish a new version of the Helm chart to the OCI registry:
+
+1. Update the chart version in `Chart.yaml` if needed (optional, as CI/CD will update it)
+2. Create and push a git tag with the format `v*.*.*-chart`:
+   ```bash
+   git tag v1.0.0-chart
+   git push origin v1.0.0-chart
+   ```
+3. GitHub Actions will automatically:
+   - Update the chart version in `Chart.yaml`
+   - Package the Helm chart
+   - Push it to `ghcr.io/anhkhoa289/spring-playground`
+
 ## Notes
 
 - The default configuration includes Spring Boot Actuator health endpoints for liveness and readiness probes. Make sure Spring Boot Actuator is enabled in your application.
 - PostgreSQL is deployed as a StatefulSet with persistent storage by default.
+- Chart releases use tags with `-chart` suffix (e.g., `v1.0.0-chart`) to avoid conflicts with application releases
+- Maven package releases use tags without suffix (e.g., `v1.0.0`)
 - For production use, consider:
   - Changing default passwords
   - Enabling ingress with TLS

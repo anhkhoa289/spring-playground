@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    # Skip if tag ends with -chart (reserved for Helm chart releases)
+    if: ${{ !endsWith(github.ref, '-chart') }}
     permissions:
       contents: read
       packages: write

@@ -1,0 +1,55 @@
+name: Helm Chart OCI Deployment
+
+on:
+  push:
+    tags:
+      - 'v*.*.*-chart'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          # Extract version from tag (e.g., v1.0.0-chart -> 1.0.0)
+          VERSION=${GITHUB_REF#refs/tags/v}
+          VERSION=${VERSION%-chart}
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Chart version: ${VERSION}"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
+
+      - name: Update Chart version
+        run: |
+          sed -i "s/^version:.*/version: ${{ steps.get_version.outputs.VERSION }}/" helm/spring-playground/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"${{ steps.get_version.outputs.VERSION }}\"/" helm/spring-playground/Chart.yaml
+          cat helm/spring-playground/Chart.yaml
+
+      - name: Package Helm chart
+        run: |
+          helm package helm/spring-playground
+
+      - name: Login to GitHub Container Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push Helm chart to OCI registry
+        run: |
+          CHART_PACKAGE=$(ls spring-playground-*.tgz)
+          helm push ${CHART_PACKAGE} oci://ghcr.io/${{ github.repository_owner }}
+          echo "Pushed chart: ${CHART_PACKAGE}"
+
+      - name: Logout from registry
+        if: always()
+        run: helm registry logout ghcr.io
