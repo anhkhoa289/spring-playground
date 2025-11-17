@@ -34,6 +34,14 @@ public class User implements Serializable {
     @JsonManagedReference
     private List<Post> posts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Favorite> favorites = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Resource> resources = new ArrayList<>();
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
