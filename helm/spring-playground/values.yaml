@@ -1,0 +1,158 @@
+# Default values for spring-playground
+replicaCount: 1
+
+image:
+  repository: spring-playground
+  pullPolicy: IfNotPresent
+  tag: "0.0.1-SNAPSHOT"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: spring-playground.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: spring-playground-tls
+  #    hosts:
+  #      - spring-playground.local
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Application configuration
+application:
+  name: playground
+  port: 8080
+  logLevel: INFO
+
+# Spring Boot environment variables
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: "production"
+  - name: SERVER_PORT
+    value: "8080"
+  - name: SPRING_DATASOURCE_URL
+    value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/springdb"
+  - name: SPRING_DATASOURCE_USERNAME
+    value: "postgres"
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Release.Name }}-postgresql"
+        key: password
+  - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+    value: "update"
+  - name: SPRING_CACHE_TYPE
+    value: "hazelcast"
+
+# Liveness and readiness probes
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8080
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# PostgreSQL configuration (Bitnami chart)
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: postgres
+    database: springdb
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# ConfigMap for additional configuration
+configMap:
+  enabled: true
+  data:
+    application.yml: |
+      spring:
+        application:
+          name: playground
+        jpa:
+          hibernate:
+            ddl-auto: update
+          show-sql: false
+          properties:
+            hibernate:
+              dialect: org.hibernate.dialect.PostgreSQLDialect
+              format_sql: true
+          database-platform: org.hibernate.dialect.PostgreSQLDialect
+        cache:
+          type: hazelcast
+      logging:
+        level:
+          com.khoa.spring.playground: INFO
