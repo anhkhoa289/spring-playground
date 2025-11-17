@@ -28,7 +28,9 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String email;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    // Removed JPA cascade - using database-level ON DELETE CASCADE instead
+    // This improves performance for bulk delete operations
+    @OneToMany(mappedBy = "user")
     @JsonManagedReference
     private List<Post> posts = new ArrayList<>();
 
