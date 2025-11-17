@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: spring-postgres
+    environment:
+      POSTGRES_DB: springdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - spring-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hazelcast:
+    image: hazelcast/hazelcast:latest
+    container_name: spring-hazelcast
+    environment:
+      - JAVA_OPTS=-Dhazelcast.config=/opt/hazelcast/config/hazelcast.xml
+    ports:
+      - "5701:5701"
+    networks:
+      - spring-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5701/hazelcast/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  spring-network:
+    driver: bridge
