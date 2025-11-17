@@ -34,7 +34,8 @@ public class Resource implements Serializable {
     @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "resource", cascade = CascadeType.ALL, orphanRemoval = true)
+    // Removed JPA cascade - using database-level ON DELETE CASCADE instead
+    @OneToMany(mappedBy = "resource")
     @JsonManagedReference
     private List<ResourceDetail> resourceDetails = new ArrayList<>();
 

@@ -11,5 +11,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByUserId(Long userId);
 
+    /**
+     * Count posts by user ID
+     */
+    long countByUserId(Long userId);
+
     List<Post> findByTitleContainingIgnoreCase(String title);
 }

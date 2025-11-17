@@ -3,7 +3,9 @@ package com.khoa.spring.playground.service;
 import com.khoa.spring.playground.entity.DeleteJob;
 import com.khoa.spring.playground.entity.DeleteJobStatus;
 import com.khoa.spring.playground.repository.DeleteJobRepository;
+import com.khoa.spring.playground.repository.FavoriteRepository;
 import com.khoa.spring.playground.repository.PostRepository;
+import com.khoa.spring.playground.repository.ResourceRepository;
 import com.khoa.spring.playground.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,11 @@ import java.util.concurrent.CompletableFuture;
  * Service for handling user deletion operations
  * Supports both synchronous and asynchronous deletion modes
  * Uses database-level CASCADE DELETE for optimal performance
+ *
+ * Handles deletion of all user-related entities:
+ * - Posts
+ * - Favorites
+ * - Resources (including nested ResourceDetails)
  */
 @Service
 @Slf4j
@@ -29,6 +36,8 @@ public class UserDeletionService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ResourceRepository resourceRepository;
     private final DeleteJobRepository deleteJobRepository;
     private final CacheManager cacheManager;
 
@@ -58,21 +67,25 @@ public class UserDeletionService {
             );
         }
 
-        // Count total posts for progress tracking
-        long totalPosts = postRepository.findByUserId(userId).size();
+        // Count total records for progress tracking (all entities that will be deleted)
+        long totalPosts = postRepository.countByUserId(userId);
+        long totalFavorites = favoriteRepository.countByUserId(userId);
+        long totalResources = resourceRepository.countByUserId(userId);
+        long totalResourceDetails = resourceRepository.countResourceDetailsByUserId(userId);
+        long totalRecords = totalPosts + totalFavorites + totalResources + totalResourceDetails;
 
         // Create job tracking record
         DeleteJob job = new DeleteJob();
         job.setId(UUID.randomUUID().toString());
         job.setUserId(userId);
         job.setStatus(DeleteJobStatus.PENDING);
-        job.setTotalRecords(totalPosts);
+        job.setTotalRecords(totalRecords);
         job.setProcessedRecords(0L);
         job.setCreatedAt(LocalDateTime.now());
         deleteJobRepository.save(job);
 
-        log.info("Delete job scheduled - JobID: {}, UserID: {}, Total posts: {}",
-            job.getId(), userId, totalPosts);
+        log.info("Delete job scheduled - JobID: {}, UserID: {}, Total records: {} (posts: {}, favorites: {}, resources: {}, resource_details: {})",
+            job.getId(), userId, totalRecords, totalPosts, totalFavorites, totalResources, totalResourceDetails);
 
         // Execute async deletion
         deleteUserAsync(job.getId());
@@ -114,14 +127,20 @@ public class UserDeletionService {
             // Update progress (DB CASCADE completed all posts)
             job.setProcessedRecords(job.getTotalRecords());
 
-            // Clear cache
-            // Note: Clearing entire posts cache because we don't know all post IDs
-            // Alternative: Track post IDs before delete for selective eviction
+            // Clear cache for all affected entities
+            // Note: Clearing entire caches because we don't know all record IDs
+            // Alternative: Track IDs before delete for selective eviction
             if (cacheManager.getCache("users") != null) {
                 cacheManager.getCache("users").evict(userId);
             }
             if (cacheManager.getCache("posts") != null) {
                 cacheManager.getCache("posts").clear();
+            }
+            if (cacheManager.getCache("favorites") != null) {
+                cacheManager.getCache("favorites").clear();
+            }
+            if (cacheManager.getCache("resources") != null) {
+                cacheManager.getCache("resources").clear();
             }
 
             // Mark job as completed
@@ -162,15 +181,22 @@ public class UserDeletionService {
 
         log.info("Starting synchronous delete for user: {}", userId);
 
-        // Database CASCADE handles posts automatically
+        // Database CASCADE handles all related entities automatically
+        // (posts, favorites, resources, resource_details)
         userRepository.deleteById(userId);
 
-        // Clear cache
+        // Clear cache for all affected entities
         if (cacheManager.getCache("users") != null) {
             cacheManager.getCache("users").evict(userId);
         }
         if (cacheManager.getCache("posts") != null) {
             cacheManager.getCache("posts").clear();
+        }
+        if (cacheManager.getCache("favorites") != null) {
+            cacheManager.getCache("favorites").clear();
+        }
+        if (cacheManager.getCache("resources") != null) {
+            cacheManager.getCache("resources").clear();
         }
 
         log.info("Synchronous delete completed for user: {}", userId);
