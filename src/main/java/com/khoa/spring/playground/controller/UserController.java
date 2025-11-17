@@ -62,7 +62,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @CacheEvict(value = "users", allEntries = true)
+    @CacheEvict(value = {"users", "posts"}, allEntries = true)
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
