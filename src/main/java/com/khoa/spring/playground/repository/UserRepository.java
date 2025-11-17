@@ -1,6 +1,6 @@
-package com.example.springplayground.repository;
+package com.khoa.spring.playground.repository;
 
-import com.example.springplayground.entity.User;
+import com.khoa.spring.playground.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

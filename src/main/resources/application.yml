@@ -1,6 +1,6 @@
 spring:
   application:
-    name: spring-playground
+    name: playground
 
   datasource:
     url: jdbc:postgresql://localhost:5432/springdb
@@ -26,6 +26,6 @@ server:
 
 logging:
   level:
-    com.example.springplayground: DEBUG
+    com.khoa.spring.playground: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE

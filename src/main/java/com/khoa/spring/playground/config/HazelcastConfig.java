@@ -1,4 +1,4 @@
-package com.example.springplayground.config;
+package com.khoa.spring.playground.config;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;

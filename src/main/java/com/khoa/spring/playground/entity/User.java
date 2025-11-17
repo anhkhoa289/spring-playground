@@ -1,4 +1,4 @@
-package com.example.springplayground.entity;
+package com.khoa.spring.playground.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -8,15 +8,15 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.5.7</version>
         <relativePath/>
     </parent>
 
-    <groupId>com.example</groupId>
-    <artifactId>spring-playground</artifactId>
+    <groupId>com.khoa.spring</groupId>
+    <artifactId>playground</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring-playground</name>
-    <description>Spring Boot 3 project with PostgreSQL and Hazelcast</description>
+    <name>playground</name>
+    <description>Play with Spring Boot</description>
 
     <properties>
         <java.version>17</java.version>

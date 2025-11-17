@@ -1,7 +1,7 @@
-package com.example.springplayground.controller;
+package com.khoa.spring.playground.controller;
 
-import com.example.springplayground.entity.User;
-import com.example.springplayground.repository.UserRepository;
+import com.khoa.spring.playground.entity.User;
+import com.khoa.spring.playground.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
