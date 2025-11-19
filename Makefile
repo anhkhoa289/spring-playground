@@ -1,4 +1,4 @@
-.PHONY: help sonar-start sonar-stop sonar-token sonar-scan clean
+.PHONY: help install run sonar-start sonar-stop sonar-token sonar-scan clean
 
 # Variables
 SONAR_HOST_URL := http://localhost:9000
@@ -11,11 +11,24 @@ PROJECT_VERSION := 0.0.1-SNAPSHOT
 
 help:
 	@echo "Available targets:"
+	@echo "  install        - Clean and install project without running tests"
+	@echo "  run            - Run the Spring Boot application"
 	@echo "  sonar-start    - Start SonarQube container"
 	@echo "  sonar-stop     - Stop SonarQube container"
 	@echo "  sonar-token    - Generate and display SonarQube token"
 	@echo "  sonar-scan     - Run SonarQube scan locally using Docker"
 	@echo "  clean          - Remove SonarQube volumes and data"
+
+# Clean and install project without running tests
+install:
+	@echo "Cleaning and installing project without tests..."
+	./mvnw clean install -DskipTests
+	@echo "Build completed successfully!"
+
+# Run the Spring Boot application
+run:
+	@echo "Starting Spring Boot application..."
+	./mvnw spring-boot:run
 
 # Start SonarQube service
 sonar-start:
