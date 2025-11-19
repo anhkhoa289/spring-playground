@@ -22,6 +22,9 @@ public class DeleteJob implements Serializable {
     @Id
     private String id;  // UUID
 
+    @Version
+    private Long version;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DeleteJobStatus status;
