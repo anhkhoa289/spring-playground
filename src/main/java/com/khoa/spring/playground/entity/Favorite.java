@@ -8,22 +8,16 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "favorites")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Favorite implements Serializable {
+public class Favorite extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Version
-    private Long version;
 
     @Column(nullable = false)
     private String name;
@@ -36,12 +30,4 @@ public class Favorite implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User user;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
 }
