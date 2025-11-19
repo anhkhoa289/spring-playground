@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Entity for tracking async user deletion jobs
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteJob implements Serializable {
+public class DeleteJob extends BaseEntity {
 
     @Id
     private String id;  // UUID
@@ -35,11 +34,8 @@ public class DeleteJob implements Serializable {
     @Column(name = "processed_records")
     private Long processedRecords;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     @Column(name = "completed_at")
-    private LocalDateTime completedAt;
+    private Instant completedAt;
 
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
@@ -59,9 +55,6 @@ public class DeleteJob implements Serializable {
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
         if (processedRecords == null) {
             processedRecords = 0L;
         }

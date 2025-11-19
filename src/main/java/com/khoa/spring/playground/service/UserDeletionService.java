@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -81,7 +81,7 @@ public class UserDeletionService {
         job.setStatus(DeleteJobStatus.PENDING);
         job.setTotalRecords(totalRecords);
         job.setProcessedRecords(0L);
-        job.setCreatedAt(LocalDateTime.now());
+        // Note: createdAt is automatically set by @CreationTimestamp in BaseEntity
         deleteJobRepository.save(job);
 
         log.info("Delete job scheduled - JobID: {}, UserID: {}, Total records: {} (posts: {}, favorites: {}, resources: {}, resource_details: {})",
@@ -145,7 +145,7 @@ public class UserDeletionService {
 
             // Mark job as completed
             job.setStatus(DeleteJobStatus.COMPLETED);
-            job.setCompletedAt(LocalDateTime.now());
+            job.setCompletedAt(Instant.now());
             deleteJobRepository.save(job);
 
             log.info("Delete job completed - JobID: {}, UserID: {}, Duration: {}ms",
@@ -158,7 +158,7 @@ public class UserDeletionService {
 
             job.setStatus(DeleteJobStatus.FAILED);
             job.setErrorMessage(e.getMessage());
-            job.setCompletedAt(LocalDateTime.now());
+            job.setCompletedAt(Instant.now());
             deleteJobRepository.save(job);
 
             throw new RuntimeException("Delete operation failed for job: " + jobId, e);
