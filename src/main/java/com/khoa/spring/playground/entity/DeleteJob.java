@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Entity for tracking async user deletion jobs
@@ -35,7 +35,7 @@ public class DeleteJob extends BaseEntity {
     private Long processedRecords;
 
     @Column(name = "completed_at")
-    private LocalDateTime completedAt;
+    private Instant completedAt;
 
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
