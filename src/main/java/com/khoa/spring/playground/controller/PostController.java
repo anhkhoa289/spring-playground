@@ -1,5 +1,6 @@
 package com.khoa.spring.playground.controller;
 
+import com.khoa.spring.playground.annotation.Idempotent;
 import com.khoa.spring.playground.entity.Post;
 import com.khoa.spring.playground.entity.User;
 import com.khoa.spring.playground.repository.PostRepository;
@@ -45,6 +46,7 @@ public class PostController {
     }
 
     @PostMapping
+    @Idempotent
     @CacheEvict(value = "posts", allEntries = true)
     public ResponseEntity<Post> createPost(@RequestBody PostRequest request) {
         return userRepository.findById(request.getUserId())
@@ -60,6 +62,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
+    @Idempotent
     @CacheEvict(value = "posts", allEntries = true)
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
         return postRepository.findById(id)

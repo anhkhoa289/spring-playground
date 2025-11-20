@@ -1,5 +1,6 @@
 package com.khoa.spring.playground.controller;
 
+import com.khoa.spring.playground.annotation.Idempotent;
 import com.khoa.spring.playground.dto.DeleteJobResponse;
 import com.khoa.spring.playground.dto.DeleteJobStatusResponse;
 import com.khoa.spring.playground.entity.DeleteJob;
@@ -45,6 +46,7 @@ public class UserController {
     }
 
     @PostMapping
+    @Idempotent
     @CacheEvict(value = "users", allEntries = true)
     public ResponseEntity<User> createUser(@RequestBody User user) {
         if (userRepository.existsByUsername(user.getUsername())) {
@@ -55,6 +57,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @Idempotent
     @CacheEvict(value = "users", allEntries = true)
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         return userRepository.findById(id)
