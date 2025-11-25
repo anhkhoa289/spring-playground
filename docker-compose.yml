@@ -49,6 +49,61 @@ services:
       timeout: 10s
       retries: 5
 
+  # Grafana Alloy - Telemetry collector
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    ports:
+      - "12345:12345"  # Alloy UI
+    volumes:
+      - ./config/alloy/config.alloy:/etc/alloy/config.alloy
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+    networks:
+      - observability
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  # Grafana Mimir - Metrics storage
+  mimir:
+    image: grafana/mimir:latest
+    container_name: mimir
+    ports:
+      - "9009:9009"
+    command:
+      - -config.file=/etc/mimir/mimir.yaml
+    volumes:
+      - ./config/mimir/mimir.yaml:/etc/mimir/mimir.yaml
+      - mimir-data:/data
+    networks:
+      - observability
+    restart: unless-stopped
+
+  # Grafana - Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - observability
+    depends_on:
+      - mimir
+    restart: unless-stopped
+
 volumes:
   postgres_data:
     driver: local
@@ -58,7 +113,11 @@ volumes:
     driver: local
   sonarqube_logs:
     driver: local
+  mimir-data:
+  grafana-data:
 
 networks:
   spring-network:
+    driver: bridge
+  observability:
     driver: bridge
