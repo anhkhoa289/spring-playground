@@ -6,7 +6,7 @@ spring:
     name: playground
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/springdb}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/playground}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
