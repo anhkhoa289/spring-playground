@@ -3,7 +3,7 @@ package com.khoa.spring.playground.entity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,18 +20,25 @@ class UserTest {
     }
 
     @Test
-    void onCreate_ShouldSetCreatedAt() {
-        // Arrange
+    void createdAt_ShouldBeNullByDefault() {
+        // Assert
         assertNull(user.getCreatedAt());
-        LocalDateTime beforeCall = LocalDateTime.now();
+    }
+
+    @Test
+    void timestamps_CanBeSetManually() {
+        // Arrange
+        Instant now = Instant.now();
 
         // Act
-        user.onCreate();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
 
         // Assert
         assertNotNull(user.getCreatedAt());
-        assertTrue(user.getCreatedAt().isAfter(beforeCall.minusSeconds(1)));
-        assertTrue(user.getCreatedAt().isBefore(LocalDateTime.now().plusSeconds(1)));
+        assertNotNull(user.getUpdatedAt());
+        assertEquals(now, user.getCreatedAt());
+        assertEquals(now, user.getUpdatedAt());
     }
 
     @Test
@@ -51,18 +58,20 @@ class UserTest {
     @Test
     void constructor_AllArgs_ShouldCreateUserWithAllFields() {
         // Arrange
-        LocalDateTime now = LocalDateTime.now();
         ArrayList<Post> posts = new ArrayList<>();
+        ArrayList<Favorite> favorites = new ArrayList<>();
+        ArrayList<Resource> resources = new ArrayList<>();
 
         // Act
-        User newUser = new User(1L, "user", "user@test.com", posts, now);
+        User newUser = new User(1L, "user", "user@test.com", posts, favorites, resources);
 
         // Assert
         assertEquals(1L, newUser.getId());
         assertEquals("user", newUser.getUsername());
         assertEquals("user@test.com", newUser.getEmail());
         assertEquals(posts, newUser.getPosts());
-        assertEquals(now, newUser.getCreatedAt());
+        assertEquals(favorites, newUser.getFavorites());
+        assertEquals(resources, newUser.getResources());
     }
 
     @Test
@@ -71,7 +80,7 @@ class UserTest {
         user.setId(1L);
         user.setUsername("newusername");
         user.setEmail("newemail@test.com");
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         user.setCreatedAt(now);
         ArrayList<Post> posts = new ArrayList<>();
         user.setPosts(posts);
@@ -131,7 +140,7 @@ class UserTest {
     void toString_ShouldContainAllFields() {
         // Arrange
         user.setId(1L);
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         user.setCreatedAt(now);
 
         // Act

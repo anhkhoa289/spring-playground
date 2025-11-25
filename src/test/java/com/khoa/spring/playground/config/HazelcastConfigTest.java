@@ -3,6 +3,7 @@ package com.khoa.spring.playground.config;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,8 @@ class HazelcastConfigTest {
 
     @BeforeEach
     void setUp() {
+        // Shutdown all existing instances to avoid conflicts
+        Hazelcast.shutdownAll();
         hazelcastConfig = new HazelcastConfig();
     }
 
@@ -25,6 +28,8 @@ class HazelcastConfigTest {
         if (hazelcastInstance != null && hazelcastInstance.getLifecycleService().isRunning()) {
             hazelcastInstance.shutdown();
         }
+        // Ensure clean state after each test
+        Hazelcast.shutdownAll();
     }
 
     @Test
@@ -78,6 +83,9 @@ class HazelcastConfigTest {
     void hazelcastInstance_ShouldCreateInstanceWithConfig() {
         // Arrange
         Config config = hazelcastConfig.hazelcastConfig();
+        // Disable network join for unit test to avoid cluster connection issues
+        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
+        config.getNetworkConfig().getJoin().getAutoDetectionConfig().setEnabled(false);
 
         // Act
         hazelcastInstance = hazelcastConfig.hazelcastInstance(config);
@@ -92,6 +100,9 @@ class HazelcastConfigTest {
     void hazelcastInstance_ShouldUseProvidedConfig() {
         // Arrange
         Config config = hazelcastConfig.hazelcastConfig();
+        // Disable network join for unit test to avoid cluster connection issues
+        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
+        config.getNetworkConfig().getJoin().getAutoDetectionConfig().setEnabled(false);
 
         // Act
         hazelcastInstance = hazelcastConfig.hazelcastInstance(config);
