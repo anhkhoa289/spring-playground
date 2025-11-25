@@ -1,6 +1,7 @@
 package com.khoa.spring.playground.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,6 +23,7 @@ import java.time.Instant;
  * - Best practice for audit fields
  */
 @MappedSuperclass
+@Data
 @Getter
 @Setter
 public abstract class BaseEntity implements Serializable {

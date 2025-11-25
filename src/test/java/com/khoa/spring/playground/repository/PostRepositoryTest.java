@@ -22,6 +22,9 @@ class PostRepositoryTest {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private User testUser;
     private Post testPost;
 
@@ -246,34 +249,40 @@ class PostRepositoryTest {
     }
 
     @Test
-    void cascadeDelete_ShouldDeletePostsWhenUserIsDeleted() {
+    void databaseCascadeDelete_ShouldDeletePostsWhenUserIsDeleted() {
         // Arrange
         entityManager.persistAndFlush(testPost);
         Long postId = testPost.getId();
         Long userId = testUser.getId();
 
         // Act
-        entityManager.remove(testUser);
+        // Using repository instead of entityManager to trigger database-level cascade
+        userRepository.deleteById(userId);
         entityManager.flush();
+        entityManager.clear();
 
         // Assert
+        // Database-level cascade delete should remove posts
         Optional<Post> foundPost = postRepository.findById(postId);
         assertFalse(foundPost.isPresent());
     }
 
     @Test
-    void orphanRemoval_ShouldDeletePostWhenRemovedFromUserCollection() {
+    void noCascade_PostsShouldNotBeDeletedWhenRemovedFromUserCollection() {
         // Arrange
         entityManager.persistAndFlush(testPost);
         Long postId = testPost.getId();
 
         // Act
+        // Removing from collection should NOT delete posts (no orphan removal)
         testUser.getPosts().clear();
         entityManager.merge(testUser);
         entityManager.flush();
+        entityManager.clear();
 
         // Assert
+        // Post should still exist because orphan removal is not configured
         Optional<Post> foundPost = postRepository.findById(postId);
-        assertFalse(foundPost.isPresent());
+        assertTrue(foundPost.isPresent());
     }
 }

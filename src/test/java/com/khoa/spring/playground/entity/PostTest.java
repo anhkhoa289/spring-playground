@@ -3,7 +3,7 @@ package com.khoa.spring.playground.entity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,53 +26,26 @@ class PostTest {
     }
 
     @Test
-    void onCreate_ShouldSetCreatedAtAndUpdatedAt() {
-        // Arrange
+    void timestamps_ShouldBeNullByDefault() {
+        // Assert
         assertNull(post.getCreatedAt());
         assertNull(post.getUpdatedAt());
-        LocalDateTime beforeCall = LocalDateTime.now();
-
-        // Act
-        post.onCreate();
-
-        // Assert
-        assertNotNull(post.getCreatedAt());
-        assertNotNull(post.getUpdatedAt());
-        assertTrue(post.getCreatedAt().isAfter(beforeCall.minusSeconds(1)));
-        assertTrue(post.getUpdatedAt().isAfter(beforeCall.minusSeconds(1)));
-        assertTrue(post.getCreatedAt().isBefore(LocalDateTime.now().plusSeconds(1)));
-        assertTrue(post.getUpdatedAt().isBefore(LocalDateTime.now().plusSeconds(1)));
     }
 
     @Test
-    void onCreate_ShouldSetBothTimestampsToSameValue() {
-        // Act
-        post.onCreate();
-
-        // Assert
-        assertNotNull(post.getCreatedAt());
-        assertNotNull(post.getUpdatedAt());
-        // Both timestamps should be equal or very close (within same second)
-        assertEquals(post.getCreatedAt(), post.getUpdatedAt());
-    }
-
-    @Test
-    void onUpdate_ShouldUpdateUpdatedAtOnly() throws InterruptedException {
+    void timestamps_CanBeSetManually() {
         // Arrange
-        post.onCreate();
-        LocalDateTime originalCreatedAt = post.getCreatedAt();
-        LocalDateTime originalUpdatedAt = post.getUpdatedAt();
-
-        // Small delay to ensure different timestamp
-        Thread.sleep(10);
+        Instant now = Instant.now();
 
         // Act
-        post.onUpdate();
+        post.setCreatedAt(now);
+        post.setUpdatedAt(now);
 
         // Assert
-        assertEquals(originalCreatedAt, post.getCreatedAt()); // createdAt should not change
-        assertNotEquals(originalUpdatedAt, post.getUpdatedAt()); // updatedAt should change
-        assertTrue(post.getUpdatedAt().isAfter(originalUpdatedAt));
+        assertNotNull(post.getCreatedAt());
+        assertNotNull(post.getUpdatedAt());
+        assertEquals(now, post.getCreatedAt());
+        assertEquals(now, post.getUpdatedAt());
     }
 
     @Test
@@ -91,19 +64,14 @@ class PostTest {
 
     @Test
     void constructor_AllArgs_ShouldCreatePostWithAllFields() {
-        // Arrange
-        LocalDateTime now = LocalDateTime.now();
-
-        // Act
-        Post newPost = new Post(1L, "Title", "Content", user, now, now);
+        // Arrange & Act
+        Post newPost = new Post(1L, "Title", "Content", user);
 
         // Assert
         assertEquals(1L, newPost.getId());
         assertEquals("Title", newPost.getTitle());
         assertEquals("Content", newPost.getContent());
         assertEquals(user, newPost.getUser());
-        assertEquals(now, newPost.getCreatedAt());
-        assertEquals(now, newPost.getUpdatedAt());
     }
 
     @Test
@@ -112,7 +80,7 @@ class PostTest {
         post.setId(1L);
         post.setTitle("New Title");
         post.setContent("New Content");
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         post.setCreatedAt(now);
         post.setUpdatedAt(now);
         User newUser = new User();
@@ -130,7 +98,7 @@ class PostTest {
     @Test
     void equals_ShouldWorkCorrectly() {
         // Arrange
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
 
         Post post1 = new Post();
         post1.setId(1L);
@@ -173,7 +141,7 @@ class PostTest {
     void toString_ShouldContainAllFields() {
         // Arrange
         post.setId(1L);
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         post.setCreatedAt(now);
         post.setUpdatedAt(now);
 
@@ -184,26 +152,5 @@ class PostTest {
         assertTrue(result.contains("Test Post"));
         assertTrue(result.contains("Test Content"));
         assertTrue(result.contains("1"));
-    }
-
-    @Test
-    void multipleUpdates_ShouldKeepUpdatingTimestamp() throws InterruptedException {
-        // Arrange
-        post.onCreate();
-        LocalDateTime firstCreated = post.getCreatedAt();
-
-        // Act & Assert - First update
-        Thread.sleep(10);
-        post.onUpdate();
-        LocalDateTime firstUpdate = post.getUpdatedAt();
-        assertEquals(firstCreated, post.getCreatedAt());
-        assertTrue(firstUpdate.isAfter(firstCreated));
-
-        // Act & Assert - Second update
-        Thread.sleep(10);
-        post.onUpdate();
-        LocalDateTime secondUpdate = post.getUpdatedAt();
-        assertEquals(firstCreated, post.getCreatedAt());
-        assertTrue(secondUpdate.isAfter(firstUpdate));
     }
 }

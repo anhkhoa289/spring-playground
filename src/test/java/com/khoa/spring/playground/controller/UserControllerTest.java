@@ -2,6 +2,7 @@ package com.khoa.spring.playground.controller;
 
 import com.khoa.spring.playground.entity.User;
 import com.khoa.spring.playground.repository.UserRepository;
+import com.khoa.spring.playground.service.UserDeletionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,9 @@ class UserControllerTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private UserDeletionService deletionService;
+
     @InjectMocks
     private UserController userController;
 
@@ -38,7 +42,7 @@ class UserControllerTest {
         testUser.setId(1L);
         testUser.setUsername("testuser");
         testUser.setEmail("test@example.com");
-        testUser.setCreatedAt(LocalDateTime.now());
+        testUser.setCreatedAt(Instant.now());
     }
 
     @Test
@@ -220,15 +224,15 @@ class UserControllerTest {
     void deleteUser_ShouldReturnNoContent_WhenUserExists() {
         // Arrange
         when(userRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(userRepository).deleteById(1L);
+        doNothing().when(deletionService).deleteUserSync(1L);
 
         // Act
-        ResponseEntity<Void> response = userController.deleteUser(1L);
+        ResponseEntity<?> response = userController.deleteUser(1L, "sync");
 
         // Assert
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(userRepository, times(1)).existsById(1L);
-        verify(userRepository, times(1)).deleteById(1L);
+        verify(deletionService, times(1)).deleteUserSync(1L);
     }
 
     @Test
@@ -237,11 +241,11 @@ class UserControllerTest {
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
         // Act
-        ResponseEntity<Void> response = userController.deleteUser(999L);
+        ResponseEntity<?> response = userController.deleteUser(999L, "sync");
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         verify(userRepository, times(1)).existsById(999L);
-        verify(userRepository, never()).deleteById(anyLong());
+        verify(deletionService, never()).deleteUserSync(anyLong());
     }
 }

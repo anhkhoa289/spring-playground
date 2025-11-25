@@ -1,0 +1,36 @@
+// Prometheus scrape configuration for Spring Boot application
+prometheus.scrape "spring_boot" {
+  targets = [{
+    __address__ = "host.docker.internal:8080",
+  }]
+
+  forward_to = [prometheus.remote_write.mimir.receiver]
+
+  job_name = "spring-boot-playground"
+  metrics_path = "/actuator/prometheus"
+  scrape_interval = "15s"
+  scrape_timeout = "10s"
+}
+
+// Remote write to Mimir (or Prometheus)
+prometheus.remote_write "mimir" {
+  endpoint {
+    url = "http://mimir:9009/api/v1/push"
+
+    queue_config {
+      capacity = 10000
+      max_shards = 10
+      min_shards = 1
+      max_samples_per_send = 5000
+      batch_send_deadline = "5s"
+      min_backoff = "30ms"
+      max_backoff = "5s"
+    }
+  }
+}
+
+// Logging configuration
+logging {
+  level = "info"
+  format = "logfmt"
+}
