@@ -20,6 +20,26 @@ Grafana (port 3000)
     ↓ (visualize metrics)
 ```
 
+## Cấu trúc Dự án
+
+```
+spring-playground/
+├── docker-compose.yml              # Docker Compose chính (bao gồm cả observability)
+├── config/
+│   ├── alloy/
+│   │   └── config.alloy           # Cấu hình Alloy collector
+│   ├── grafana/
+│   │   ├── dashboards/
+│   │   │   └── spring-boot-dashboard.json
+│   │   └── provisioning/
+│   │       ├── datasources/
+│   │       └── dashboards/
+│   └── mimir/
+│       └── mimir.yaml             # Cấu hình Mimir storage
+└── docs/
+    └── observability.md           # Tài liệu này
+```
+
 ## Cài đặt và Chạy
 
 ### 1. Build Spring Boot Application
@@ -43,8 +63,13 @@ java -jar target/playground-0.0.1-SNAPSHOT.jar
 ### 3. Khởi động Observability Stack
 
 ```bash
-cd config
 docker-compose up -d
+```
+
+Hoặc chỉ khởi động observability services:
+
+```bash
+docker-compose up -d alloy mimir grafana
 ```
 
 ### 4. Kiểm tra Services
@@ -189,16 +214,20 @@ curl http://localhost:9009/prometheus/api/v1/query?query=up
 ### Xóa tất cả data và restart
 
 ```bash
-cd config
 docker-compose down -v
-docker-compose up -d
+docker-compose up -d alloy mimir grafana
 ```
 
 ## Dừng Services
 
+Dừng tất cả services:
 ```bash
-cd config
 docker-compose down
+```
+
+Dừng chỉ observability services:
+```bash
+docker-compose stop alloy mimir grafana
 ```
 
 Để xóa volumes (data sẽ bị mất):
