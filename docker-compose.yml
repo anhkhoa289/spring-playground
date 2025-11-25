@@ -1,11 +1,8 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16
-    container_name: spring-postgres
     environment:
-      POSTGRES_DB: springdb
+      POSTGRES_DB: playground
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -22,7 +19,6 @@ services:
 
   hazelcast:
     image: hazelcast/hazelcast:latest
-    container_name: spring-hazelcast
     environment:
       - JAVA_OPTS=-Dhazelcast.config=/opt/hazelcast/config/hazelcast.xml
     ports:
@@ -37,7 +33,6 @@ services:
 
   sonarqube:
     image: sonarqube:latest
-    container_name: spring-sonarqube
     environment:
       - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
     ports:
