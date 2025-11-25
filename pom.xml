@@ -70,6 +70,12 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
 
+        <!-- Spring AOP for logging and timing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!-- Lombok (optional, for reducing boilerplate code) -->
         <dependency>
             <groupId>org.projectlombok</groupId>

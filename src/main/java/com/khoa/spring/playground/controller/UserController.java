@@ -1,5 +1,6 @@
 package com.khoa.spring.playground.controller;
 
+import com.khoa.spring.playground.annotation.LogExecutionTime;
 import com.khoa.spring.playground.dto.DeleteJobResponse;
 import com.khoa.spring.playground.dto.DeleteJobStatusResponse;
 import com.khoa.spring.playground.entity.DeleteJob;
@@ -24,12 +25,14 @@ public class UserController {
     private final UserDeletionService deletionService;
 
     @GetMapping
+    @LogExecutionTime("Get all users")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
     @GetMapping("/{id}")
     @Cacheable(value = "users", key = "#id")
+    @LogExecutionTime("Get user by ID")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return userRepository.findById(id)
             .map(ResponseEntity::ok)
@@ -38,6 +41,7 @@ public class UserController {
 
     @GetMapping("/username/{username}")
     @Cacheable(value = "users", key = "#username")
+    @LogExecutionTime("Get user by username")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
         return userRepository.findByUsername(username)
             .map(ResponseEntity::ok)
@@ -46,6 +50,7 @@ public class UserController {
 
     @PostMapping
     @CacheEvict(value = "users", allEntries = true)
+    @LogExecutionTime("Create new user")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         if (userRepository.existsByUsername(user.getUsername())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -56,6 +61,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @CacheEvict(value = "users", allEntries = true)
+    @LogExecutionTime("Update user")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         return userRepository.findById(id)
             .map(existingUser -> {
@@ -88,6 +94,7 @@ public class UserController {
      * @return DeleteJobResponse (async) or Void (sync)
      */
     @DeleteMapping("/{id}")
+    @LogExecutionTime("Delete user")
     public ResponseEntity<?> deleteUser(
             @PathVariable Long id,
             @RequestParam(defaultValue = "async") String mode) {
@@ -123,6 +130,7 @@ public class UserController {
      * @return Job status with progress information
      */
     @GetMapping("/delete-jobs/{jobId}")
+    @LogExecutionTime("Get delete job status")
     public ResponseEntity<DeleteJobStatusResponse> getDeleteJobStatus(
             @PathVariable String jobId) {
 
