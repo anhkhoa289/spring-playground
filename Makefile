@@ -88,7 +88,6 @@ sonar-scan:
 		-Dsonar.projectVersion=$(PROJECT_VERSION) \
 		-Dsonar.sources=src/main/java \
 		-Dsonar.java.binaries=target/classes \
-		-Dsonar.java.libraries=target/*.jar \
 		-Dsonar.junit.reportPaths=target/surefire-reports \
 		-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 	@echo ""
