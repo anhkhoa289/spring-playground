@@ -193,7 +193,7 @@ class UserDeletionServiceTest {
     // ==================== deleteUserAsync Tests ====================
 
     @Test
-    void deleteUserAsync_ShouldCompleteSuccessfully_WhenJobExists() throws Exception {
+    void deleteUserAsync_ShouldCompleteSuccessfully_WhenJobExists() {
         // Arrange
         when(deleteJobRepository.findById(testJobId)).thenReturn(Optional.of(testJob));
         when(deleteJobRepository.save(any(DeleteJob.class))).thenReturn(testJob);
@@ -204,8 +204,8 @@ class UserDeletionServiceTest {
         doNothing().when(userRepository).deleteById(testUserId);
 
         // Act
-        CompletableFuture<Void> future = userDeletionService.deleteUserAsync(testJobId);
-        future.get(); // Wait for async operation
+        // In unit test, @Async doesn't work, method runs synchronously
+        userDeletionService.deleteUserAsync(testJobId);
 
         // Assert
         // Verify job status updates
@@ -228,22 +228,20 @@ class UserDeletionServiceTest {
     }
 
     @Test
-    void deleteUserAsync_ShouldHandleFailure_WhenDeletionFails() throws Exception {
+    void deleteUserAsync_ShouldHandleFailure_WhenDeletionFails() {
         // Arrange
         when(deleteJobRepository.findById(testJobId)).thenReturn(Optional.of(testJob));
         when(deleteJobRepository.save(any(DeleteJob.class))).thenReturn(testJob);
         doThrow(new RuntimeException("Database error")).when(userRepository).deleteById(testUserId);
 
-        // Act
-        CompletableFuture<Void> future = userDeletionService.deleteUserAsync(testJobId);
-
-        // Assert
-        java.util.concurrent.ExecutionException exception = assertThrows(
-            java.util.concurrent.ExecutionException.class,
-            () -> future.get()
+        // Act & Assert
+        // In unit test, @Async doesn't work, so exception is thrown directly
+        RuntimeException exception = assertThrows(
+            RuntimeException.class,
+            () -> userDeletionService.deleteUserAsync(testJobId)
         );
 
-        assertTrue(exception.getCause().getMessage().contains("Delete operation failed"));
+        assertTrue(exception.getMessage().contains("Delete operation failed"));
 
         // Verify job status was set to FAILED
         ArgumentCaptor<DeleteJob> jobCaptor = ArgumentCaptor.forClass(DeleteJob.class);
@@ -272,7 +270,7 @@ class UserDeletionServiceTest {
     }
 
     @Test
-    void deleteUserAsync_ShouldHandleNullCaches_Gracefully() throws Exception {
+    void deleteUserAsync_ShouldHandleNullCaches_Gracefully() {
         // Arrange
         when(deleteJobRepository.findById(testJobId)).thenReturn(Optional.of(testJob));
         when(deleteJobRepository.save(any(DeleteJob.class))).thenReturn(testJob);
@@ -280,8 +278,8 @@ class UserDeletionServiceTest {
         doNothing().when(userRepository).deleteById(testUserId);
 
         // Act
-        CompletableFuture<Void> future = userDeletionService.deleteUserAsync(testJobId);
-        future.get(); // Wait for async operation
+        // In unit test, @Async doesn't work, method runs synchronously
+        userDeletionService.deleteUserAsync(testJobId);
 
         // Assert
         verify(userRepository).deleteById(testUserId);
