@@ -11,8 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -59,7 +59,7 @@ class UserDeletionServiceTest {
     @Mock
     private Cache resourcesCache;
 
-    @InjectMocks
+    @Spy
     private UserDeletionService userDeletionService;
 
     private DeleteJob testJob;
@@ -78,6 +78,17 @@ class UserDeletionServiceTest {
         testJob.setTotalRecords(100L);
         testJob.setProcessedRecords(0L);
         testJob.setCreatedAt(Instant.now());
+
+        // Manually inject mocks into the spy
+        userDeletionService = new UserDeletionService(
+            userRepository,
+            postRepository,
+            favoriteRepository,
+            resourceRepository,
+            deleteJobRepository,
+            cacheManager
+        );
+        userDeletionService = spy(userDeletionService);
     }
 
     // ==================== scheduleDelete Tests ====================
@@ -96,6 +107,10 @@ class UserDeletionServiceTest {
             job.setId(testJobId);
             return job;
         });
+
+        // Mock the async call to prevent actual execution
+        doReturn(CompletableFuture.completedFuture(null))
+            .when(userDeletionService).deleteUserAsync(anyString());
 
         // Act
         String jobId = userDeletionService.scheduleDelete(testUserId);
@@ -121,6 +136,7 @@ class UserDeletionServiceTest {
         verify(favoriteRepository).countByUserId(testUserId);
         verify(resourceRepository).countByUserId(testUserId);
         verify(resourceRepository).countResourceDetailsByUserId(testUserId);
+        verify(userDeletionService).deleteUserAsync(testJobId);
     }
 
     @Test
@@ -224,12 +240,12 @@ class UserDeletionServiceTest {
         CompletableFuture<Void> future = userDeletionService.deleteUserAsync(testJobId);
 
         // Assert
-        RuntimeException exception = assertThrows(
-            RuntimeException.class,
+        java.util.concurrent.ExecutionException exception = assertThrows(
+            java.util.concurrent.ExecutionException.class,
             () -> future.get()
         );
 
-        assertTrue(exception.getMessage().contains("Delete operation failed"));
+        assertTrue(exception.getCause().getMessage().contains("Delete operation failed"));
 
         // Verify job status was set to FAILED
         ArgumentCaptor<DeleteJob> jobCaptor = ArgumentCaptor.forClass(DeleteJob.class);
