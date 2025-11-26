@@ -27,8 +27,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Run tests with Maven
-        run: ./mvnw test
+      - name: Run tests and generate coverage report
+        run: ./mvnw verify
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
