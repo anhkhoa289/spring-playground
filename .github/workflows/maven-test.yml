@@ -30,13 +30,23 @@ jobs:
       - name: Run tests with Maven
         run: ./mvnw test
 
-      - name: Generate test report
-        if: always()
-        run: ./mvnw surefire-report:report
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          name: test-results
-          path: target/surefire-reports/
+          args: >
+            ${{ github.event_name == 'pull_request' && format('-Dsonar.pullrequest.key={0}', github.event.pull_request.number) || '' }}
+            ${{ github.event_name == 'pull_request' && format('-Dsonar.pullrequest.branch={0}', github.head_ref) || '' }}
+            ${{ github.event_name == 'pull_request' && format('-Dsonar.pullrequest.base={0}', github.base_ref) || '' }}
+
+#      - name: Generate test report
+#        if: always()
+#        run: ./mvnw surefire-report:report
+#
+#      - name: Upload test results
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: test-results
+#          path: target/surefire-reports/
