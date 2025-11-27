@@ -152,9 +152,23 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <parallel>methods</parallel>
-                    <threadCount>4</threadCount>
+                    <!-- JUnit 5 parallel execution (disable Surefire's parallel mode) -->
+                    <parallel>none</parallel>
                     <reuseForks>true</reuseForks>
+                    <forkCount>1</forkCount>
+
+                    <!-- JUnit 5 Parallel Execution Configuration via System Properties -->
+                    <properties>
+                        <!-- Enable parallel execution -->
+                        <configurationParameters>
+                            junit.jupiter.execution.parallel.enabled=true
+                            junit.jupiter.execution.parallel.mode.default=concurrent
+                            junit.jupiter.execution.parallel.mode.classes.default=concurrent
+                            junit.jupiter.execution.parallel.config.strategy=dynamic
+                            junit.jupiter.execution.parallel.config.dynamic.factor=1.0
+                            junit.jupiter.execution.parallel.config.dynamic.max-pool-size-factor=2.0
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
 
