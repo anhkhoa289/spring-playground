@@ -146,6 +146,18 @@
                 </configuration>
             </plugin>
 
+            <!-- Surefire Plugin for parallel test execution -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <parallel>methods</parallel>
+                    <threadCount>4</threadCount>
+                    <reuseForks>true</reuseForks>
+                </configuration>
+            </plugin>
+
             <!-- JaCoCo Maven Plugin for Code Coverage -->
             <!-- Note: JaCoCo has compatibility issues with Java 21. Disabled by default. -->
             <!-- Run with -Djacoco.skip=false to enable coverage -->
