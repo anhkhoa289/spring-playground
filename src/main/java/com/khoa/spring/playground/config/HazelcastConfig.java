@@ -5,14 +5,16 @@ import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(name = "spring.cache.type", havingValue = "hazelcast", matchIfMissing = false)
 public class HazelcastConfig {
 
     @Bean
-    public Config hazelcastConfig() {
+    public Config hazelcastConfiguration() {
         Config config = new Config();
         config.setInstanceName("hazelcast-instance");
 
@@ -33,7 +35,7 @@ public class HazelcastConfig {
     }
 
     @Bean
-    public HazelcastInstance hazelcastInstance(Config hazelcastConfig) {
-        return Hazelcast.newHazelcastInstance(hazelcastConfig);
+    public HazelcastInstance hazelcastInstance(Config hazelcastConfiguration) {
+        return Hazelcast.newHazelcastInstance(hazelcastConfiguration);
     }
 }

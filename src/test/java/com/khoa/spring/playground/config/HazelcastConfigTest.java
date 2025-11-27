@@ -35,7 +35,7 @@ class HazelcastConfigTest {
     @Test
     void hazelcastConfig_ShouldCreateConfigWithCorrectInstanceName() {
         // Act
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
 
         // Assert
         assertNotNull(config);
@@ -45,7 +45,7 @@ class HazelcastConfigTest {
     @Test
     void hazelcastConfig_ShouldConfigureNetworkCorrectly() {
         // Act
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         NetworkConfig networkConfig = config.getNetworkConfig();
 
         // Assert
@@ -57,7 +57,7 @@ class HazelcastConfigTest {
     @Test
     void hazelcastConfig_ShouldDisableMulticast() {
         // Act
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
 
         // Assert
@@ -68,7 +68,7 @@ class HazelcastConfigTest {
     @Test
     void hazelcastConfig_ShouldEnableTcpIpWithMembers() {
         // Act
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
 
         // Assert
@@ -82,7 +82,7 @@ class HazelcastConfigTest {
     @Test
     void hazelcastInstance_ShouldCreateInstanceWithConfig() {
         // Arrange
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         // Disable network join for unit test to avoid cluster connection issues
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getAutoDetectionConfig().setEnabled(false);
@@ -99,7 +99,7 @@ class HazelcastConfigTest {
     @Test
     void hazelcastInstance_ShouldUseProvidedConfig() {
         // Arrange
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         // Disable network join for unit test to avoid cluster connection issues
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getAutoDetectionConfig().setEnabled(false);
@@ -116,8 +116,8 @@ class HazelcastConfigTest {
     @Test
     void hazelcastConfig_ShouldBeReusable() {
         // Act
-        Config config1 = hazelcastConfig.hazelcastConfig();
-        Config config2 = hazelcastConfig.hazelcastConfig();
+        Config config1 = hazelcastConfig.hazelcastConfiguration();
+        Config config2 = hazelcastConfig.hazelcastConfiguration();
 
         // Assert
         assertNotNull(config1);
