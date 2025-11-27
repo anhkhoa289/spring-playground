@@ -15,10 +15,9 @@ spring:
         format_sql: true
 
   cache:
-    type: simple
-
-hazelcast:
-  enabled: false
+    # Using 'none' to completely disable caching in tests
+    # This prevents Hazelcast from loading
+    type: none
 
 logging:
   level:
