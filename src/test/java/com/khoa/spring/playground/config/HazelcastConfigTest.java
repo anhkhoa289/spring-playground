@@ -33,31 +33,33 @@ class HazelcastConfigTest {
     }
 
     @Test
-    void hazelcastConfig_ShouldCreateConfigWithCorrectInstanceName() {
+    void hazelcastConfig_ShouldCreateConfigWithCorrectInstanceName() throws Exception {
         // Act
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
 
         // Assert
         assertNotNull(config);
-        assertEquals("hazelcast-instance", config.getInstanceName());
+        // Tests load from test/resources/hazelcast.yml
+        assertEquals("test-instance", config.getInstanceName());
     }
 
     @Test
-    void hazelcastConfig_ShouldConfigureNetworkCorrectly() {
+    void hazelcastConfig_ShouldConfigureNetworkCorrectly() throws Exception {
         // Act
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         NetworkConfig networkConfig = config.getNetworkConfig();
 
         // Assert
         assertNotNull(networkConfig);
-        assertEquals(5701, networkConfig.getPort());
+        // Tests load from test/resources/hazelcast.yml
+        assertEquals(5702, networkConfig.getPort());
         assertTrue(networkConfig.isPortAutoIncrement());
     }
 
     @Test
-    void hazelcastConfig_ShouldDisableMulticast() {
+    void hazelcastConfig_ShouldDisableMulticast() throws Exception {
         // Act
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
 
         // Assert
@@ -66,23 +68,21 @@ class HazelcastConfigTest {
     }
 
     @Test
-    void hazelcastConfig_ShouldEnableTcpIpWithMembers() {
+    void hazelcastConfig_ShouldEnableTcpIpWithMembers() throws Exception {
         // Act
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
 
         // Assert
         assertNotNull(joinConfig);
-        assertTrue(joinConfig.getTcpIpConfig().isEnabled());
-        assertTrue(joinConfig.getTcpIpConfig().getMembers().contains("localhost"));
-        assertTrue(joinConfig.getTcpIpConfig().getMembers().contains("hazelcast"));
-        assertEquals(2, joinConfig.getTcpIpConfig().getMembers().size());
+        // Tests load from test/resources/hazelcast.yml which has tcp-ip disabled
+        assertFalse(joinConfig.getTcpIpConfig().isEnabled());
     }
 
     @Test
-    void hazelcastInstance_ShouldCreateInstanceWithConfig() {
+    void hazelcastInstance_ShouldCreateInstanceWithConfig() throws Exception {
         // Arrange
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         // Disable network join for unit test to avoid cluster connection issues
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getAutoDetectionConfig().setEnabled(false);
@@ -92,14 +92,15 @@ class HazelcastConfigTest {
 
         // Assert
         assertNotNull(hazelcastInstance);
-        assertEquals("hazelcast-instance", hazelcastInstance.getName());
+        // Tests load from test/resources/hazelcast.yml
+        assertEquals("test-instance", hazelcastInstance.getName());
         assertTrue(hazelcastInstance.getLifecycleService().isRunning());
     }
 
     @Test
-    void hazelcastInstance_ShouldUseProvidedConfig() {
+    void hazelcastInstance_ShouldUseProvidedConfig() throws Exception {
         // Arrange
-        Config config = hazelcastConfig.hazelcastConfig();
+        Config config = hazelcastConfig.hazelcastConfiguration();
         // Disable network join for unit test to avoid cluster connection issues
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getAutoDetectionConfig().setEnabled(false);
@@ -114,10 +115,10 @@ class HazelcastConfigTest {
     }
 
     @Test
-    void hazelcastConfig_ShouldBeReusable() {
+    void hazelcastConfig_ShouldBeReusable() throws Exception {
         // Act
-        Config config1 = hazelcastConfig.hazelcastConfig();
-        Config config2 = hazelcastConfig.hazelcastConfig();
+        Config config1 = hazelcastConfig.hazelcastConfiguration();
+        Config config2 = hazelcastConfig.hazelcastConfiguration();
 
         // Assert
         assertNotNull(config1);

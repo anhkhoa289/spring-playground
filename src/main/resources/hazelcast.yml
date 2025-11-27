@@ -1,0 +1,30 @@
+hazelcast:
+  instance-name: hazelcast-instance
+
+  network:
+    port:
+      auto-increment: true
+      port: 5701
+    join:
+      multicast:
+        enabled: false
+      tcp-ip:
+        enabled: true
+        member-list:
+          - localhost
+          - hazelcast
+
+  # Cache configurations
+  map:
+    users:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    posts:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    favorites:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    resources:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800

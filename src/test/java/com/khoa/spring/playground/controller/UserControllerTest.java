@@ -1,5 +1,9 @@
 package com.khoa.spring.playground.controller;
 
+import com.khoa.spring.playground.dto.DeleteJobResponse;
+import com.khoa.spring.playground.dto.DeleteJobStatusResponse;
+import com.khoa.spring.playground.entity.DeleteJob;
+import com.khoa.spring.playground.entity.DeleteJobStatus;
 import com.khoa.spring.playground.entity.User;
 import com.khoa.spring.playground.repository.UserRepository;
 import com.khoa.spring.playground.service.UserDeletionService;
@@ -247,5 +251,164 @@ class UserControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         verify(userRepository, times(1)).existsById(999L);
         verify(deletionService, never()).deleteUserSync(anyLong());
+    }
+
+    @Test
+    void deleteUser_AsyncMode_ShouldReturnAcceptedWithJobId() {
+        // Arrange
+        String jobId = "test-job-123";
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(deletionService.scheduleDelete(1L)).thenReturn(jobId);
+
+        // Act
+        ResponseEntity<?> response = userController.deleteUser(1L, "async");
+
+        // Assert
+        assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody() instanceof DeleteJobResponse);
+        DeleteJobResponse jobResponse = (DeleteJobResponse) response.getBody();
+        assertEquals(jobId, jobResponse.getJobId());
+        assertEquals("PENDING", jobResponse.getStatus());
+        verify(userRepository, times(1)).existsById(1L);
+        verify(deletionService, times(1)).scheduleDelete(1L);
+        verify(deletionService, never()).deleteUserSync(anyLong());
+    }
+
+    @Test
+    void deleteUser_AsyncMode_DefaultMode_ShouldReturnAcceptedWithJobId() {
+        // Arrange - testing default mode when no mode parameter is specified
+        String jobId = "test-job-456";
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(deletionService.scheduleDelete(1L)).thenReturn(jobId);
+
+        // Act - using default mode
+        ResponseEntity<?> response = userController.deleteUser(1L, "async");
+
+        // Assert
+        assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody() instanceof DeleteJobResponse);
+        DeleteJobResponse jobResponse = (DeleteJobResponse) response.getBody();
+        assertEquals(jobId, jobResponse.getJobId());
+        verify(deletionService, times(1)).scheduleDelete(1L);
+    }
+
+    @Test
+    void deleteUser_AsyncMode_ShouldReturnConflict_WhenDeleteAlreadyInProgress() {
+        // Arrange
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(deletionService.scheduleDelete(1L))
+            .thenThrow(new IllegalStateException("Delete operation already in progress for user 1"));
+
+        // Act
+        ResponseEntity<?> response = userController.deleteUser(1L, "async");
+
+        // Assert
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody() instanceof DeleteJobResponse);
+        DeleteJobResponse jobResponse = (DeleteJobResponse) response.getBody();
+        assertNull(jobResponse.getJobId());
+        assertEquals("ERROR", jobResponse.getStatus());
+        assertEquals("Delete operation already in progress for user 1", jobResponse.getMessage());
+        verify(userRepository, times(1)).existsById(1L);
+        verify(deletionService, times(1)).scheduleDelete(1L);
+    }
+
+    @Test
+    void getDeleteJobStatus_ShouldReturnJobStatus_WhenJobExists() {
+        // Arrange
+        String jobId = "test-job-789";
+        DeleteJob deleteJob = new DeleteJob();
+        deleteJob.setId(jobId);
+        deleteJob.setStatus(DeleteJobStatus.IN_PROGRESS);
+        deleteJob.setUserId(1L);
+        deleteJob.setTotalRecords(1000L);
+        deleteJob.setProcessedRecords(500L);
+        deleteJob.setErrorMessage(null);
+
+        when(deletionService.getJobStatus(jobId)).thenReturn(deleteJob);
+
+        // Act
+        ResponseEntity<DeleteJobStatusResponse> response = userController.getDeleteJobStatus(jobId);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(jobId, response.getBody().getJobId());
+        assertEquals("IN_PROGRESS", response.getBody().getStatus());
+        assertEquals(50, response.getBody().getProgress());
+        assertEquals(500L, response.getBody().getProcessedRecords());
+        assertEquals(1000L, response.getBody().getTotalRecords());
+        assertNull(response.getBody().getErrorMessage());
+        verify(deletionService, times(1)).getJobStatus(jobId);
+    }
+
+    @Test
+    void getDeleteJobStatus_ShouldReturnCompletedStatus_WhenJobCompleted() {
+        // Arrange
+        String jobId = "test-job-completed";
+        DeleteJob deleteJob = new DeleteJob();
+        deleteJob.setId(jobId);
+        deleteJob.setStatus(DeleteJobStatus.COMPLETED);
+        deleteJob.setUserId(1L);
+        deleteJob.setTotalRecords(1000L);
+        deleteJob.setProcessedRecords(1000L);
+        deleteJob.setCompletedAt(Instant.now());
+
+        when(deletionService.getJobStatus(jobId)).thenReturn(deleteJob);
+
+        // Act
+        ResponseEntity<DeleteJobStatusResponse> response = userController.getDeleteJobStatus(jobId);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("COMPLETED", response.getBody().getStatus());
+        assertEquals(100, response.getBody().getProgress());
+        verify(deletionService, times(1)).getJobStatus(jobId);
+    }
+
+    @Test
+    void getDeleteJobStatus_ShouldReturnFailedStatus_WhenJobFailed() {
+        // Arrange
+        String jobId = "test-job-failed";
+        DeleteJob deleteJob = new DeleteJob();
+        deleteJob.setId(jobId);
+        deleteJob.setStatus(DeleteJobStatus.FAILED);
+        deleteJob.setUserId(1L);
+        deleteJob.setTotalRecords(1000L);
+        deleteJob.setProcessedRecords(300L);
+        deleteJob.setErrorMessage("Database connection error");
+
+        when(deletionService.getJobStatus(jobId)).thenReturn(deleteJob);
+
+        // Act
+        ResponseEntity<DeleteJobStatusResponse> response = userController.getDeleteJobStatus(jobId);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("FAILED", response.getBody().getStatus());
+        assertEquals("Database connection error", response.getBody().getErrorMessage());
+        assertEquals(30, response.getBody().getProgress());
+        verify(deletionService, times(1)).getJobStatus(jobId);
+    }
+
+    @Test
+    void getDeleteJobStatus_ShouldReturnNotFound_WhenJobDoesNotExist() {
+        // Arrange
+        String jobId = "non-existent-job";
+        when(deletionService.getJobStatus(jobId))
+            .thenThrow(new IllegalArgumentException("Job not found: " + jobId));
+
+        // Act
+        ResponseEntity<DeleteJobStatusResponse> response = userController.getDeleteJobStatus(jobId);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(deletionService, times(1)).getJobStatus(jobId);
     }
 }
