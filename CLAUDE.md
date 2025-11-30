@@ -179,3 +179,66 @@ Configuration in `sonar-project.properties`:
 - Organization: `anhkhoa289`
 - Project: `anhkhoa289_spring-playground`
 - Coverage reports from JaCoCo at `target/site/jacoco/jacoco.xml`
+
+## Penetration Testing
+
+Security testing tools and scripts are available in the `pentest/` directory.
+
+### Quick Start
+```bash
+# Start the application
+docker-compose up -d
+mvn spring-boot:run
+
+# Run basic penetration tests
+cd pentest
+./run-pentest.sh
+
+# Run OWASP ZAP scan
+./run-zap-scan.sh baseline  # Quick scan
+./run-zap-scan.sh full      # Comprehensive scan
+```
+
+### Available Tools
+
+1. **Basic Pentest** (`run-pentest.sh`)
+   - IDOR vulnerability testing
+   - Actuator information disclosure
+   - SQL injection testing
+   - XSS testing
+   - Mass assignment testing
+   - Authentication/authorization checks
+   - Rate limiting tests
+   - Security headers validation
+
+2. **OWASP ZAP Scanning** (`run-zap-scan.sh`)
+   - `baseline` - Quick passive scan (5-10 minutes)
+   - `full` - Comprehensive active scan (15-30 minutes)
+   - `api` - API-focused testing
+   - `daemon` - Interactive ZAP GUI mode
+
+3. **Test Data Generation** (`create-test-data.sh`)
+   - Creates sample users and posts
+   - Includes XSS and SQL injection test cases
+   - Prepares database for security testing
+
+### Documentation
+
+- `PENTEST.md` - Comprehensive penetration testing guide (Vietnamese)
+- `pentest/README.md` - Quick start guide and tool usage
+- Reports saved to `pentest/reports/` directory
+
+### Known Security Issues
+
+**⚠️ This is a development/learning project with intentional security vulnerabilities for testing purposes:**
+
+1. **CRITICAL**: No authentication/authorization implemented
+2. **CRITICAL**: IDOR vulnerabilities in all endpoints
+3. **CRITICAL**: Actuator endpoints expose sensitive information
+4. **HIGH**: No rate limiting (vulnerable to DoS)
+5. **HIGH**: Missing security headers
+6. **MEDIUM**: No input validation/sanitization
+
+**Do NOT deploy this application to production without addressing these security issues!**
+
+See `PENTEST.md` for detailed vulnerability analysis and remediation steps.
