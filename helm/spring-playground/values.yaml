@@ -75,15 +75,12 @@ application:
   name: playground
   port: 8080
   logLevel: INFO
-  # Environment: dev, staging, prod
-  environment: prod
 
 # Spring Boot environment variables
 env:
-  # Combined profiles: platform (k8s/ecs) + environment (dev/staging/prod)
-  # Example: "k8s,prod" for Kubernetes production
+  # Use k8s profile for Kubernetes deployment
   - name: SPRING_PROFILES_ACTIVE
-    value: "k8s,{{ .Values.application.environment }}"
+    value: "k8s"
   - name: SERVER_PORT
     value: "8080"
   - name: SPRING_DATASOURCE_URL

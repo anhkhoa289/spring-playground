@@ -1,414 +1,307 @@
 # Spring Profiles Guide
 
-This document explains the Spring Profile configuration strategy for the Spring Playground application.
+This document explains the Spring Profile configuration for the Spring Playground application.
 
-## Profile Architecture
+## Overview
 
-The application uses a **two-dimensional profile system**:
+The application uses a **simple profile system** based on deployment platform:
 
-1. **Platform Profiles** - Hazelcast discovery mechanism
-   - `default` - Local development (TCP-IP)
-   - `k8s` - Kubernetes (Pod discovery)
-   - `ecs` - AWS ECS (AWS API discovery)
+- **default** - Local development (no profile needed)
+- **docker** - Docker Compose deployment
+- **k8s** - Kubernetes deployment
+- **ecs** - AWS ECS deployment
 
-2. **Environment Profiles** - Application configuration
-   - `dev` - Development
-   - `staging` - Staging/Pre-production
-   - `prod` - Production
+## Profile Structure
 
-### Profile Combinations
+### Main Configuration
 
-Profiles can be combined using comma separation:
+**All common configuration is in `application.yml`**. Profile-specific files only contain minimal overrides.
 
-```bash
-SPRING_PROFILES_ACTIVE=k8s,prod    # Kubernetes + Production
-SPRING_PROFILES_ACTIVE=ecs,staging # AWS ECS + Staging
-SPRING_PROFILES_ACTIVE=dev         # Local development
+```
+src/main/resources/
+├── application.yml              # Main configuration (all common settings)
+├── application-docker.yml       # Docker overrides (empty)
+├── application-k8s.yml          # Kubernetes overrides (empty)
+├── application-ecs.yml          # ECS overrides (debug logging for AWS)
+├── hazelcast.yml                # Default Hazelcast (local)
+├── hazelcast-docker.yml         # Docker Compose Hazelcast
+├── hazelcast-k8s.yml            # Kubernetes Hazelcast
+└── hazelcast-ecs.yml            # AWS ECS Hazelcast
 ```
 
-## Platform Profiles
+## Profiles
 
-### Default (Local Development)
+### default (Local Development)
 
-**Config Files:** `application.yml`, `hazelcast.yml`
-
-**Features:**
-- TCP-IP member discovery
-- Connects to external Hazelcast (docker-compose)
-- `ddl-auto: update` - Auto-update schema
-- Verbose logging (DEBUG)
-- All actuator endpoints exposed
+**Files:** `application.yml`, `hazelcast.yml`
 
 **Usage:**
 ```bash
 # No profile needed - this is default
 mvn spring-boot:run
 
-# Or explicitly
-mvn spring-boot:run -Dspring.profiles.active=dev
+# Or run directly
+java -jar target/playground-0.0.1-SNAPSHOT.jar
 ```
 
-### k8s (Kubernetes)
+**Hazelcast:** Embedded instance (no clustering)
 
-**Config Files:** `hazelcast-k8s.yml`
+**Best for:**
+- Local development
+- Testing features
+- Quick prototyping
 
-**Features:**
-- Kubernetes pod discovery
-- Service-based member discovery
-- Requires RBAC permissions
-- Private IP networking
+---
+
+### docker (Docker Compose)
+
+**Files:** `application.yml`, `application-docker.yml`, `hazelcast-docker.yml`
 
 **Usage:**
 ```bash
-# Via Helm (automatically sets k8s profile)
+# Set in docker-compose.yml
+environment:
+  SPRING_PROFILES_ACTIVE: docker
+
+# Or via command line
+docker-compose up -d
+docker exec -it app java -jar app.jar --spring.profiles.active=docker
+```
+
+**Hazelcast:** TCP-IP discovery via service name `app`
+
+**Best for:**
+- Multi-container local testing
+- Integration testing with PostgreSQL
+- Simulating production environment locally
+
+---
+
+### k8s (Kubernetes)
+
+**Files:** `application.yml`, `application-k8s.yml`, `hazelcast-k8s.yml`
+
+**Usage:**
+```bash
+# Automatically set via Helm
 helm install spring-playground ./helm/spring-playground
 
-# With environment override
-helm install spring-playground ./helm/spring-playground \
-  --set application.environment=staging
+# Or manually
+kubectl set env deployment/spring-playground SPRING_PROFILES_ACTIVE=k8s
 ```
+
+**Hazelcast:** Kubernetes pod discovery via service name
 
 **Required Environment Variables:**
 ```yaml
-SPRING_PROFILES_ACTIVE: k8s,prod
+SPRING_PROFILES_ACTIVE: k8s
 HAZELCAST_KUBERNETES_NAMESPACE: default
 HAZELCAST_KUBERNETES_SERVICE_NAME: spring-playground
 HAZELCAST_KUBERNETES_SERVICE_LABEL: spring-playground
 ```
 
+**Best for:**
+- Production Kubernetes deployments
+- Auto-scaling environments
+- Multi-replica deployments
+
+---
+
 ### ecs (AWS ECS)
 
-**Config Files:** `hazelcast-ecs.yml`, `application-ecs.yml`
-
-**Features:**
-- AWS EC2/ECS instance discovery
-- IAM role-based authentication
-- Tag-based filtering
-- Works with Fargate and EC2
+**Files:** `application.yml`, `application-ecs.yml`, `hazelcast-ecs.yml`
 
 **Usage:**
 ```bash
 # Set in ECS Task Definition
-SPRING_PROFILES_ACTIVE=ecs,prod
-AWS_REGION=us-east-1
-HAZELCAST_TAG_KEY=hazelcast-cluster
-HAZELCAST_TAG_VALUE=spring-playground
-```
-
-## Environment Profiles
-
-### dev (Development)
-
-**Config File:** `application-dev.yml`
-
-**Characteristics:**
-```yaml
-JPA:
-  ddl-auto: create-drop  # Recreate schema on restart
-  show-sql: true         # Show all SQL queries
-
-Logging:
-  level: DEBUG           # Verbose logging
-  show-parameters: true  # Show SQL parameters
-
-Actuator:
-  expose: "*"           # All endpoints exposed
-
-Error:
-  include-stacktrace: always
-  include-message: always
-```
-
-**Best For:**
-- Local development
-- Testing schema changes
-- Debugging issues
-- Rapid iteration
-
-**Not Suitable For:**
-- Shared environments
-- Production
-- Performance testing
-
-### staging (Staging/Pre-production)
-
-**Config File:** `application-staging.yml`
-
-**Characteristics:**
-```yaml
-JPA:
-  ddl-auto: validate     # Only validate schema
-  show-sql: false
-
-Logging:
-  level: INFO            # Standard logging
-
-Actuator:
-  expose: health,metrics # Limited endpoints
-  show-details: when-authorized
-
-Error:
-  include-stacktrace: on_param  # Only with ?trace=true
-```
-
-**Best For:**
-- Integration testing
-- UAT (User Acceptance Testing)
-- Performance testing
-- Production-like environment
-
-**Features:**
-- Auto-scaling enabled
-- Moderate resource allocation
-- Production-like configuration
-- Some debugging capabilities
-
-### prod (Production)
-
-**Config File:** `application-prod.yml`
-
-**Characteristics:**
-```yaml
-JPA:
-  ddl-auto: validate     # Never modify schema
-  show-sql: false
-  batch-processing: enabled
-
-Logging:
-  level: WARN            # Minimal logging
-  performance-optimized: true
-
-Actuator:
-  expose: health,prometheus  # Minimal endpoints
-  show-details: never        # Never expose internals
-
-Error:
-  include-stacktrace: never  # Security hardened
-  include-message: never
-```
-
-**Best For:**
-- Production deployments
-- Customer-facing applications
-- Performance-critical workloads
-
-**Features:**
-- Security hardened
-- Performance optimized
-- High availability (3+ replicas)
-- Auto-scaling enabled
-- Pod disruption budget
-- Multi-zone deployment
-
-## Usage Examples
-
-### Local Development
-
-```bash
-# Default profile (dev)
-mvn spring-boot:run
-
-# Explicit dev profile
-mvn spring-boot:run -Dspring.profiles.active=dev
-
-# With docker-compose
-docker-compose up -d
-mvn spring-boot:run
-```
-
-### Kubernetes Development
-
-```bash
-# Deploy to dev environment
-helm install spring-playground ./helm/spring-playground \
-  -f helm/spring-playground/values-dev.yaml
-
-# Result: SPRING_PROFILES_ACTIVE=k8s,dev
-```
-
-### Kubernetes Staging
-
-```bash
-# Deploy to staging environment
-helm install spring-playground ./helm/spring-playground \
-  -f helm/spring-playground/values-staging.yaml
-
-# Result: SPRING_PROFILES_ACTIVE=k8s,staging
-```
-
-### Kubernetes Production
-
-```bash
-# Deploy to production environment
-helm install spring-playground ./helm/spring-playground \
-  -f helm/spring-playground/values-prod.yaml
-
-# Result: SPRING_PROFILES_ACTIVE=k8s,prod
-```
-
-### AWS ECS Production
-
-```bash
-# Set in ECS Task Definition
 Environment:
   - Name: SPRING_PROFILES_ACTIVE
-    Value: ecs,prod
+    Value: ecs
   - Name: AWS_REGION
     Value: us-east-1
-
-# Result: Uses hazelcast-ecs.yml + application-ecs.yml + application-prod.yml
 ```
+
+**Hazelcast:** AWS EC2/ECS discovery via tags
+
+**Required Environment Variables:**
+```yaml
+SPRING_PROFILES_ACTIVE: ecs
+AWS_REGION: us-east-1
+HAZELCAST_TAG_KEY: hazelcast-cluster
+HAZELCAST_TAG_VALUE: spring-playground
+```
+
+**Best for:**
+- AWS ECS/Fargate deployments
+- AWS-native infrastructure
+- IAM role-based authentication
+
+---
+
+## Hazelcast Configuration by Profile
+
+| Profile | Discovery Method | Configuration File |
+|---------|-----------------|-------------------|
+| default | Embedded (no clustering) | `hazelcast.yml` |
+| docker  | TCP-IP (service name: `app`) | `hazelcast-docker.yml` |
+| k8s     | Kubernetes pod discovery | `hazelcast-k8s.yml` |
+| ecs     | AWS EC2/ECS tag discovery | `hazelcast-ecs.yml` |
 
 ## Configuration Precedence
 
 Spring Boot loads configurations in this order (later overrides earlier):
 
-1. `application.yml` (default)
-2. Platform profile (e.g., `hazelcast-k8s.yml`)
-3. Environment profile (e.g., `application-prod.yml`)
-4. Environment variables
-5. Command-line arguments
-
-**Example:** `SPRING_PROFILES_ACTIVE=k8s,prod`
-
 ```
-application.yml              # Base config
-  ↓ overridden by
-hazelcast-k8s.yml           # Kubernetes Hazelcast config
-  ↓ overridden by
-application-prod.yml        # Production config
-  ↓ overridden by
-Environment Variables       # Runtime config
+1. application.yml (base configuration)
+   ↓
+2. hazelcast-{profile}.yml (Hazelcast for profile)
+   ↓
+3. application-{profile}.yml (profile overrides)
+   ↓
+4. Environment Variables (runtime config)
+   ↓
+5. Command-line arguments (--spring.profiles.active=xxx)
 ```
 
-## Profile Selection Guide
+## Examples
 
-| Environment | Platform | Profiles | Use Case |
-|------------|----------|----------|----------|
-| Local Dev | Docker Compose | `dev` or none | Development on laptop |
-| Dev K8s | Kubernetes | `k8s,dev` | Shared dev cluster |
-| Staging K8s | Kubernetes | `k8s,staging` | Pre-production testing |
-| Prod K8s | Kubernetes | `k8s,prod` | Production Kubernetes |
-| Prod ECS | AWS ECS | `ecs,prod` | Production AWS ECS |
-
-## Creating Custom Profiles
-
-To add a new profile:
-
-1. **Create profile file:**
-   ```bash
-   src/main/resources/application-{profile}.yml
-   ```
-
-2. **Add to Helm values:**
-   ```yaml
-   # values-{profile}.yaml
-   application:
-     environment: {profile}
-   ```
-
-3. **Update documentation**
-
-**Example - QA Profile:**
-
-```yaml
-# application-qa.yml
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true  # QA needs SQL visibility
-logging:
-  level:
-    com.khoa.spring.playground: DEBUG  # QA needs debug logs
-```
-
-## Environment Variables
-
-### Platform Variables
-
-**Kubernetes:**
-```bash
-HAZELCAST_KUBERNETES_NAMESPACE=default
-HAZELCAST_KUBERNETES_SERVICE_NAME=spring-playground
-HAZELCAST_KUBERNETES_SERVICE_LABEL=spring-playground
-```
-
-**AWS ECS:**
-```bash
-AWS_REGION=us-east-1
-HAZELCAST_TAG_KEY=hazelcast-cluster
-HAZELCAST_TAG_VALUE=spring-playground
-HAZELCAST_SECURITY_GROUP=sg-xxx
-```
-
-### Common Variables (All Environments)
+### Local Development
 
 ```bash
-SPRING_PROFILES_ACTIVE=k8s,prod
-SPRING_DATASOURCE_URL=jdbc:postgresql://...
-SPRING_DATASOURCE_USERNAME=postgres
-SPRING_DATASOURCE_PASSWORD=***
-SPRING_CACHE_TYPE=hazelcast
-SERVER_PORT=8080
+# Default - no profile
+mvn spring-boot:run
+
+# Logs show:
+# Active Spring profiles: []
+# Loading Hazelcast configuration from: hazelcast.yml
+```
+
+### Docker Compose
+
+```bash
+# docker-compose.yml
+services:
+  app:
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+# Start
+docker-compose up -d
+
+# Logs show:
+# Active Spring profiles: [docker]
+# Loading Hazelcast configuration from: hazelcast-docker.yml
+```
+
+### Kubernetes
+
+```bash
+# Deploy
+helm install spring-playground ./helm/spring-playground
+
+# Check logs
+kubectl logs -l app.kubernetes.io/name=spring-playground | grep profile
+
+# Output:
+# Active Spring profiles: [k8s]
+# Loading Hazelcast configuration from: hazelcast-k8s.yml
+# Members {size:2, ver:2} [...]
+```
+
+### AWS ECS
+
+```bash
+# Task Definition
+{
+  "environment": [
+    {"name": "SPRING_PROFILES_ACTIVE", "value": "ecs"},
+    {"name": "AWS_REGION", "value": "us-east-1"}
+  ]
+}
+
+# Logs show:
+# Active Spring profiles: [ecs]
+# Loading Hazelcast configuration from: hazelcast-ecs.yml
 ```
 
 ## Troubleshooting
 
-### Issue: Wrong profile loaded
+### Check Active Profile
 
-**Check active profiles:**
 ```bash
+# Via actuator
 curl http://localhost:8080/actuator/env | jq '.activeProfiles'
+
+# Via logs
+grep "Active Spring profiles" application.log
 ```
 
-**Check logs:**
+### Check Hazelcast Configuration
+
 ```bash
-# Look for: "Active Spring profiles: [k8s, prod]"
-kubectl logs -l app=spring-playground | grep "Active Spring profiles"
+# Via logs
+grep "Loading Hazelcast configuration" application.log
+
+# Expected outputs:
+# - Local: "Loading Hazelcast configuration from: hazelcast.yml"
+# - Docker: "Loading Hazelcast configuration from: hazelcast-docker.yml"
+# - K8s: "Loading Hazelcast configuration from: hazelcast-k8s.yml"
+# - ECS: "Loading Hazelcast configuration from: hazelcast-ecs.yml"
 ```
 
-### Issue: Hazelcast not clustering
+### Verify Clustering
 
-**Verify profile loads correct Hazelcast config:**
 ```bash
-# Should see: "Loading Hazelcast configuration from: hazelcast-k8s.yml"
-kubectl logs -l app=spring-playground | grep "Loading Hazelcast"
-```
+# Check Hazelcast members
+curl http://localhost:8080/actuator/hazelcast
 
-### Issue: Wrong configuration applied
+# Or via logs
+grep "Members {size:" application.log
 
-**Check configuration sources:**
-```bash
-curl http://localhost:8080/actuator/configprops
+# Expected:
+# Members {size:2, ver:2} [
+#   Member [10.0.1.100]:5701 - this
+#   Member [10.0.1.101]:5701
+# ]
 ```
 
 ## Best Practices
 
-1. **Always specify environment profile** in production
-   - ✅ `k8s,prod`
-   - ❌ `k8s` (falls back to default)
+1. **Keep profile-specific files minimal**
+   - Put common config in `application.yml`
+   - Only override what's different in profile files
 
-2. **Use values files for Helm deployments**
-   - ✅ `helm install -f values-prod.yaml`
-   - ❌ Manual `--set` overrides
+2. **Use explicit profiles in non-local environments**
+   - ✅ `SPRING_PROFILES_ACTIVE=k8s`
+   - ❌ Relying on defaults in production
 
-3. **Never use dev profile in production**
-   - Exposes sensitive information
-   - Performance overhead
-   - Security risks
+3. **Test profile locally before deployment**
+   ```bash
+   mvn spring-boot:run -Dspring.profiles.active=docker
+   ```
 
-4. **Validate schema separately**
-   - Use Flyway/Liquibase for migrations
-   - Keep `ddl-auto: validate` in staging/prod
+4. **Use environment variables for sensitive data**
+   - Database passwords
+   - AWS credentials
+   - API keys
 
-5. **Test profile combinations**
-   - Verify `k8s,staging` works before `k8s,prod`
-   - Test locally with combined profiles
+5. **Document profile requirements**
+   - Required environment variables
+   - Infrastructure dependencies
+   - Permissions needed (IAM, RBAC)
+
+## Summary
+
+| Profile | Use Case | Hazelcast | Command |
+|---------|----------|-----------|---------|
+| default | Local dev | Embedded | `mvn spring-boot:run` |
+| docker | Docker Compose | TCP-IP | `SPRING_PROFILES_ACTIVE=docker` |
+| k8s | Kubernetes | Pod discovery | `helm install ...` |
+| ecs | AWS ECS | AWS discovery | Set in Task Definition |
 
 ## References
 
 - [Spring Boot Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.profiles)
-- [Kubernetes Deployment Guide](./KUBERNETES.md)
-- [AWS ECS Deployment Guide](./ECS_DEPLOYMENT.md)
 - [Hazelcast Configuration](../src/main/resources/hazelcast*.yml)
+- [Kubernetes Deployment](./KUBERNETES.md)
+- [AWS ECS Deployment](./ECS_DEPLOYMENT.md)

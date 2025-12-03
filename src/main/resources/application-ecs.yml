@@ -1,53 +1,8 @@
-# AWS ECS-specific Spring Boot configuration
-spring:
-  application:
-    name: playground
+# AWS ECS profile - minimal overrides
+# Activates when SPRING_PROFILES_ACTIVE=ecs
+# Main configuration is in application.yml
 
-  # JPA configuration for ECS
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-
-  # Cache configuration
-  cache:
-    type: hazelcast
-
-# Logging configuration for AWS ECS (CloudWatch)
+# Enable debug logging for AWS discovery
 logging:
   level:
-    root: INFO
-    com.khoa.spring.playground: INFO
-    com.hazelcast: INFO
     com.hazelcast.aws: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg - %X{traceId:-},%X{spanId:-}%n"
-
-# Actuator endpoints for ECS health checks and monitoring
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,prometheus,metrics,hazelcast,env
-  endpoint:
-    health:
-      show-details: always
-      probes:
-        enabled: true
-  health:
-    livenessState:
-      enabled: true
-    readinessState:
-      enabled: true
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-    tags:
-      application: ${spring.application.name}
-      environment: ecs

@@ -44,15 +44,19 @@ public class HazelcastConfig {
 
 	/**
 	 * Determines which Hazelcast configuration file to load based on active Spring profiles.
+	 * - docker profile: hazelcast-docker.yml (Docker Compose)
 	 * - k8s profile: hazelcast-k8s.yml (Kubernetes discovery)
 	 * - ecs profile: hazelcast-ecs.yml (AWS ECS/EC2 discovery)
-	 * - default: hazelcast.yml (TCP-IP for local development)
+	 * - default: hazelcast.yml (Local development)
 	 */
 	private String getHazelcastConfigFile() {
 		String[] activeProfiles = environment.getActiveProfiles();
 		log.debug("Active Spring profiles: {}", Arrays.toString(activeProfiles));
 
-		if (Arrays.asList(activeProfiles).contains("k8s")) {
+		if (Arrays.asList(activeProfiles).contains("docker")) {
+			return "hazelcast-docker.yml";
+		}
+		else if (Arrays.asList(activeProfiles).contains("k8s")) {
 			return "hazelcast-k8s.yml";
 		}
 		else if (Arrays.asList(activeProfiles).contains("ecs")) {

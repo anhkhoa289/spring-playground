@@ -1,0 +1,2 @@
+# Docker Compose profile - minimal overrides
+# Activates when SPRING_PROFILES_ACTIVE=docker

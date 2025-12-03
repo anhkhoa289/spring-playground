@@ -1,0 +1,39 @@
+hazelcast:
+  instance-name: hazelcast-instance
+
+  network:
+    port:
+      auto-increment: true
+      port: 5701
+    join:
+      multicast:
+        enabled: false
+      # TCP-IP for docker-compose
+      tcp-ip:
+        enabled: true
+        member-list:
+          - app  # Service name in docker-compose
+      kubernetes:
+        enabled: false
+      aws:
+        enabled: false
+      auto-detection:
+        enabled: false
+
+  # Cache configurations
+  map:
+    users:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    posts:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    favorites:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    resources:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    idempotency:
+      time-to-live-seconds: 86400
+      max-idle-seconds: 43200
