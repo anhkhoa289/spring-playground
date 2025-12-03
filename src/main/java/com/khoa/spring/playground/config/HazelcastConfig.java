@@ -45,6 +45,7 @@ public class HazelcastConfig {
 	/**
 	 * Determines which Hazelcast configuration file to load based on active Spring profiles.
 	 * - k8s profile: hazelcast-k8s.yml (Kubernetes discovery)
+	 * - ecs profile: hazelcast-ecs.yml (AWS ECS/EC2 discovery)
 	 * - default: hazelcast.yml (TCP-IP for local development)
 	 */
 	private String getHazelcastConfigFile() {
@@ -53,6 +54,9 @@ public class HazelcastConfig {
 
 		if (Arrays.asList(activeProfiles).contains("k8s")) {
 			return "hazelcast-k8s.yml";
+		}
+		else if (Arrays.asList(activeProfiles).contains("ecs")) {
+			return "hazelcast-ecs.yml";
 		}
 		return "hazelcast.yml";
 	}

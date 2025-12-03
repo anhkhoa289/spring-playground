@@ -1,0 +1,49 @@
+hazelcast:
+  instance-name: hazelcast-instance
+
+  network:
+    port:
+      auto-increment: true
+      port: 5701
+    join:
+      multicast:
+        enabled: false
+      # TCP-IP disabled in AWS ECS
+      tcp-ip:
+        enabled: false
+      kubernetes:
+        enabled: false
+      # AWS ECS/EC2 discovery for production
+      aws:
+        enabled: true
+        # Use IAM role credentials (recommended for ECS tasks)
+        use-public-ip: false
+        # Discovery configuration
+        region: ${AWS_REGION:us-east-1}
+        # ECS-specific configuration
+        tag-key: ${HAZELCAST_TAG_KEY:hazelcast-cluster}
+        tag-value: ${HAZELCAST_TAG_VALUE:spring-playground}
+        # Security group for filtering instances
+        security-group-name: ${HAZELCAST_SECURITY_GROUP:}
+        # Connection timeout
+        connection-timeout-seconds: 10
+      auto-detection:
+        enabled: false
+
+  # Cache configurations (same as default)
+  map:
+    users:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    posts:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    favorites:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    resources:
+      time-to-live-seconds: 3600
+      max-idle-seconds: 1800
+    idempotency:
+      time-to-live-seconds: 86400
+      max-idle-seconds: 43200

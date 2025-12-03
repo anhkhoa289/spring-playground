@@ -70,6 +70,12 @@
             <version>${hazelcast.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-aws</artifactId>
+            <version>${hazelcast.version}</version>
+        </dependency>
+
         <!-- Spring Boot Cache Support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
