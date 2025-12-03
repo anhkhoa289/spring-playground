@@ -6,9 +6,13 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     ports:
-      - "8080"
+      - "8080"  # Docker sẽ tự động map tới port random trên host
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    networks:
+      - spring-network
+      - observability
 
   postgres:
     image: postgres:16
