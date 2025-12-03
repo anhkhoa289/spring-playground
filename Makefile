@@ -1,4 +1,4 @@
-.PHONY: help install run sonar-start sonar-stop sonar-token sonar-scan clean
+.PHONY: help install run build-image sonar-start sonar-stop sonar-token sonar-scan clean
 
 # Variables
 SONAR_HOST_URL := http://localhost:9000
@@ -8,11 +8,13 @@ SONAR_TOKEN_NAME := spring-playground-token
 PROJECT_KEY := com.khoa.spring:playground
 PROJECT_NAME := playground
 PROJECT_VERSION := 0.0.1-SNAPSHOT
+IMAGE_NAME := spring-playground:latest
 
 help:
 	@echo "Available targets:"
 	@echo "  install        - Clean and install project without running tests"
 	@echo "  run            - Run the Spring Boot application"
+	@echo "  build-image    - Build Docker image using Spring Boot buildpacks"
 	@echo "  sonar-start    - Start SonarQube container"
 	@echo "  sonar-stop     - Stop SonarQube container"
 	@echo "  sonar-token    - Generate and display SonarQube token"
@@ -29,6 +31,23 @@ install:
 run:
 	@echo "Starting Spring Boot application..."
 	./mvnw spring-boot:run
+
+# Build Docker image using Spring Boot buildpacks
+build-image:
+	@echo "Building Docker image: $(IMAGE_NAME)"
+	@echo "Note: Using Java 21 runtime (configured in pom.xml)"
+	@echo "Tip: Ensure Docker is running before building"
+	./mvnw spring-boot:build-image \
+		-Dspring-boot.build-image.imageName=$(IMAGE_NAME)
+	@echo ""
+	@echo "Image built successfully: $(IMAGE_NAME)"
+	@echo ""
+	@echo "To run the image:"
+	@echo "  docker run -p 8080:8080 \\"
+	@echo "    -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/playground \\"
+	@echo "    -e SPRING_DATASOURCE_USERNAME=postgres \\"
+	@echo "    -e SPRING_DATASOURCE_PASSWORD=postgres \\"
+	@echo "    $(IMAGE_NAME)"
 
 # Start SonarQube service
 sonar-start:

@@ -1,4 +1,15 @@
 services:
+  app:
+    image: spring-playground:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/playground
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080"
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:16
     environment:
