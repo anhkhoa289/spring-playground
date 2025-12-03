@@ -1,5 +1,5 @@
 # Default values for spring-playground
-replicaCount: 1
+replicaCount: 2
 
 image:
   repository: spring-playground
@@ -95,6 +95,17 @@ env:
     value: "update"
   - name: SPRING_CACHE_TYPE
     value: "hazelcast"
+  # Hazelcast Kubernetes discovery configuration
+  - name: HAZELCAST_KUBERNETES_ENABLED
+    value: "true"
+  - name: HAZELCAST_TCP_ENABLED
+    value: "false"
+  - name: HAZELCAST_KUBERNETES_NAMESPACE
+    value: "{{ .Release.Namespace }}"
+  - name: HAZELCAST_KUBERNETES_SERVICE_NAME
+    value: "{{ include \"spring-playground.fullname\" . }}"
+  - name: HAZELCAST_KUBERNETES_SERVICE_LABEL
+    value: "{{ include \"spring-playground.name\" . }}"
 
 # Liveness and readiness probes
 livenessProbe:

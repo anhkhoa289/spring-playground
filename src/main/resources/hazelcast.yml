@@ -8,10 +8,18 @@ hazelcast:
     join:
       multicast:
         enabled: false
+      # TCP-IP for local development with docker-compose
       tcp-ip:
-        enabled: true
+        enabled: ${HAZELCAST_TCP_ENABLED:true}
         member-list:
-          - app
+          - ${HAZELCAST_MEMBERS:app}
+      # Kubernetes discovery for production
+      kubernetes:
+        enabled: ${HAZELCAST_KUBERNETES_ENABLED:false}
+        namespace: ${HAZELCAST_KUBERNETES_NAMESPACE:default}
+        service-name: ${HAZELCAST_KUBERNETES_SERVICE_NAME:spring-playground}
+        service-label-name: app.kubernetes.io/name
+        service-label-value: ${HAZELCAST_KUBERNETES_SERVICE_LABEL:spring-playground}
       auto-detection:
         enabled: false
 

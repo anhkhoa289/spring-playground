@@ -64,6 +64,12 @@
             <version>${hazelcast.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-kubernetes</artifactId>
+            <version>${hazelcast.version}</version>
+        </dependency>
+
         <!-- Spring Boot Cache Support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
