@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.springframework.core.env.Environment;
+import org.springframework.mock.env.MockEnvironment;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,12 +20,14 @@ class HazelcastConfigTest {
 
     private HazelcastConfig hazelcastConfig;
     private HazelcastInstance hazelcastInstance;
+    private MockEnvironment environment;
 
     @BeforeEach
     void setUp() {
         // Shutdown all existing instances to avoid conflicts
         Hazelcast.shutdownAll();
-        hazelcastConfig = new HazelcastConfig();
+        environment = new MockEnvironment();
+        hazelcastConfig = new HazelcastConfig(environment);
     }
 
     @AfterEach
@@ -131,5 +135,80 @@ class HazelcastConfigTest {
         // But with same configuration
         assertEquals(config1.getInstanceName(), config2.getInstanceName());
         assertEquals(config1.getNetworkConfig().getPort(), config2.getNetworkConfig().getPort());
+    }
+
+    @Test
+    void hazelcastConfig_ShouldLoadDefaultConfigWhenNoProfileActive() throws Exception {
+        // Arrange - no active profile set
+
+        // Act
+        Config config = hazelcastConfig.hazelcastConfiguration();
+
+        // Assert
+        assertNotNull(config);
+        // Should load from test/resources/hazelcast.yml
+        assertEquals("test-instance", config.getInstanceName());
+    }
+
+    @Test
+    void hazelcastConfig_ShouldLoadDockerConfigWhenDockerProfileActive() throws Exception {
+        // Arrange
+        environment.setActiveProfiles("docker");
+        HazelcastConfig dockerConfig = new HazelcastConfig(environment);
+
+        // Act
+        Config config = dockerConfig.hazelcastConfiguration();
+
+        // Assert
+        assertNotNull(config);
+        // Should load from hazelcast-docker.yml
+        assertEquals("hazelcast-instance", config.getInstanceName());
+    }
+
+    @Test
+    void hazelcastConfig_ShouldLoadK8sConfigWhenK8sProfileActive() throws Exception {
+        // Arrange
+        environment.setActiveProfiles("k8s");
+        HazelcastConfig k8sConfig = new HazelcastConfig(environment);
+
+        // Act
+        Config config = k8sConfig.hazelcastConfiguration();
+
+        // Assert
+        assertNotNull(config);
+        // Should load from hazelcast-k8s.yml
+        assertEquals("hazelcast-instance", config.getInstanceName());
+        assertTrue(config.getNetworkConfig().getJoin().getKubernetesConfig().isEnabled());
+    }
+
+    @Test
+    void hazelcastConfig_ShouldLoadEcsConfigWhenEcsProfileActive() throws Exception {
+        // Arrange
+        environment.setActiveProfiles("ecs");
+        HazelcastConfig ecsConfig = new HazelcastConfig(environment);
+
+        // Act
+        Config config = ecsConfig.hazelcastConfiguration();
+
+        // Assert
+        assertNotNull(config);
+        // Should load from hazelcast-ecs.yml
+        assertEquals("hazelcast-instance", config.getInstanceName());
+        assertTrue(config.getNetworkConfig().getJoin().getAwsConfig().isEnabled());
+    }
+
+    @Test
+    void hazelcastConfig_ShouldPrioritizeDockerProfileWhenMultipleProfilesActive() throws Exception {
+        // Arrange
+        environment.setActiveProfiles("docker", "k8s", "ecs");
+        HazelcastConfig multiProfileConfig = new HazelcastConfig(environment);
+
+        // Act
+        Config config = multiProfileConfig.hazelcastConfiguration();
+
+        // Assert
+        assertNotNull(config);
+        // Should load from hazelcast-docker.yml (first in priority)
+        assertEquals("hazelcast-instance", config.getInstanceName());
     }
 }
