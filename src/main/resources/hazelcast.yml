@@ -9,7 +9,9 @@ hazelcast:
       multicast:
         enabled: false
       tcp-ip:
-        enabled: false
+        enabled: true
+        member-list:
+          - app
       auto-detection:
         enabled: false
 
