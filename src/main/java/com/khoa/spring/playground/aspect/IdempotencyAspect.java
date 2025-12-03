@@ -4,7 +4,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
 import com.khoa.spring.playground.annotation.Idempotent;
 import com.khoa.spring.playground.dto.IdempotencyResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,8 +18,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -29,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Aspect to handle idempotent API operations.
  * Uses Hazelcast distributed cache to store responses and prevent duplicate processing.
- * Supports both SpEL-based key generation and HTTP header-based keys.
+ * Generates cache keys using SpEL expressions from method parameters.
  */
 @Slf4j
 @Aspect
@@ -52,8 +49,8 @@ public class IdempotencyAspect {
 	@Around("@annotation(idempotent)")
 	public Object handleIdempotency(ProceedingJoinPoint joinPoint, Idempotent idempotent) throws Throwable {
 
-		// Generate idempotency key
-		String idempotencyKey = generateIdempotencyKey(joinPoint, idempotent);
+		// Generate idempotency key from SpEL expression
+		String idempotencyKey = generateKeyFromSpEL(joinPoint, idempotent.key());
 
 		// If no idempotency key could be generated, proceed without caching
 		if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
@@ -99,24 +96,6 @@ public class IdempotencyAspect {
 	}
 
 	/**
-	 * Generates the idempotency key based on annotation configuration.
-	 * Prioritizes SpEL key expression over HTTP header extraction.
-	 *
-	 * @param joinPoint The join point containing method information
-	 * @param idempotent The idempotent annotation
-	 * @return The generated idempotency key, or null if none could be generated
-	 */
-	private String generateIdempotencyKey(ProceedingJoinPoint joinPoint, Idempotent idempotent) {
-		// Priority 1: Use SpEL expression if provided
-		if (!idempotent.key().isEmpty()) {
-			return generateKeyFromSpEL(joinPoint, idempotent.key());
-		}
-
-		// Priority 2: Fall back to HTTP header
-		return generateKeyFromHeader(idempotent.keyHeader());
-	}
-
-	/**
 	 * Generates idempotency key from SpEL expression using method parameters.
 	 *
 	 * @param joinPoint The join point containing method arguments
@@ -149,33 +128,6 @@ public class IdempotencyAspect {
 		}
 		catch (Exception e) {
 			log.error("Failed to generate idempotency key from SpEL expression: {}", keyExpression, e);
-			return null;
-		}
-	}
-
-	/**
-	 * Generates idempotency key from HTTP request header.
-	 *
-	 * @param headerName The name of the header to extract
-	 * @return The header value, or null if not available
-	 */
-	private String generateKeyFromHeader(String headerName) {
-		try {
-			ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
-				.getRequestAttributes();
-			if (attributes == null) {
-				log.warn("No request context available for header extraction");
-				return null;
-			}
-
-			HttpServletRequest request = attributes.getRequest();
-			String key = request.getHeader(headerName);
-
-			log.debug("Generated idempotency key from header '{}': {}", headerName, key);
-			return key;
-		}
-		catch (Exception e) {
-			log.error("Failed to extract idempotency key from header: {}", headerName, e);
 			return null;
 		}
 	}
