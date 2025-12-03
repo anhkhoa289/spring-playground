@@ -24,7 +24,7 @@ public class TestController {
 	 * Test endpoint that generates a random number.
 	 * This endpoint is idempotent - if called with the same requestId parameter,
 	 * it will return the same cached response instead of generating a new random number.
-	 *
+	 * <p>
 	 * Uses SpEL expression to generate key from method parameter.
 	 *
 	 * @param requestId Optional idempotency key from request parameter
@@ -50,7 +50,7 @@ public class TestController {
 	/**
 	 * Test endpoint demonstrating composite key generation using SpEL expression.
 	 * The idempotency key is generated from method parameters (userId + action).
-	 *
+	 * <p>
 	 * Example: GET /api/test/random/user123?action=generate
 	 * Idempotency key will be: "user123-generate"
 	 *

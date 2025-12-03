@@ -20,7 +20,9 @@
 
     <properties>
         <java.version>21</java.version>
-        <hazelcast.version>5.4.0</hazelcast.version>
+        <hazelcast.version>5.6.0</hazelcast.version>
+        <hazelcast.aws.version>3.4</hazelcast.aws.version>
+        <hazelcast.kubernetes.version>2.2.3</hazelcast.kubernetes.version>
     </properties>
 
     <distributionManagement>
@@ -66,15 +68,16 @@
 
         <dependency>
             <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-kubernetes</artifactId>
-            <version>${hazelcast.version}</version>
+            <artifactId>hazelcast-aws</artifactId>
+            <version>${hazelcast.aws.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-aws</artifactId>
-            <version>${hazelcast.version}</version>
+            <artifactId>hazelcast-kubernetes</artifactId>
+            <version>${hazelcast.kubernetes.version}</version>
         </dependency>
+
 
         <!-- Spring Boot Cache Support -->
         <dependency>
