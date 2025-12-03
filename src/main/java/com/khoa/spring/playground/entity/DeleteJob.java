@@ -3,6 +3,7 @@ package com.khoa.spring.playground.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
@@ -13,6 +14,7 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "delete_jobs")
+@EqualsAndHashCode(callSuper = false)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

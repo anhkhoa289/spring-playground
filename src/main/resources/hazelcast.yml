@@ -9,10 +9,9 @@ hazelcast:
       multicast:
         enabled: false
       tcp-ip:
-        enabled: true
-        member-list:
-          - localhost
-          - hazelcast
+        enabled: false
+      auto-detection:
+        enabled: false
 
   # Cache configurations
   map:
