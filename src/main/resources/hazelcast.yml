@@ -29,3 +29,6 @@ hazelcast:
     resources:
       time-to-live-seconds: 3600
       max-idle-seconds: 1800
+    idempotency:
+      time-to-live-seconds: 86400
+      max-idle-seconds: 43200
