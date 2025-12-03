@@ -1,0 +1,54 @@
+# Staging environment overrides for spring-playground
+# Usage: helm install spring-playground ./helm/spring-playground -f helm/spring-playground/values-staging.yaml
+
+# Standard replica count for staging
+replicaCount: 2
+
+application:
+  environment: staging
+  logLevel: INFO
+
+# Standard resource requirements for staging
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Standard startup times
+livenessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+# PostgreSQL with moderate resources for staging
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: postgres
+    database: springdb-staging
+  primary:
+    persistence:
+      enabled: true
+      size: 5Gi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Enable autoscaling in staging
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80

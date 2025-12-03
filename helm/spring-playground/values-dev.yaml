@@ -1,0 +1,46 @@
+# Development environment overrides for spring-playground
+# Usage: helm install spring-playground ./helm/spring-playground -f helm/spring-playground/values-dev.yaml
+
+# Lower replica count for dev
+replicaCount: 1
+
+application:
+  environment: dev
+  logLevel: DEBUG
+
+# Lower resource requirements for dev
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Faster startup for dev
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  initialDelaySeconds: 15
+  periodSeconds: 10
+
+# PostgreSQL with minimal resources for dev
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: postgres
+    database: springdb-dev
+  primary:
+    persistence:
+      enabled: true
+      size: 2Gi  # Smaller storage for dev
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi

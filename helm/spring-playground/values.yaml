@@ -75,12 +75,15 @@ application:
   name: playground
   port: 8080
   logLevel: INFO
+  # Environment: dev, staging, prod
+  environment: prod
 
 # Spring Boot environment variables
 env:
-  # Use k8s profile which loads hazelcast-k8s.yml and application-k8s.yml
+  # Combined profiles: platform (k8s/ecs) + environment (dev/staging/prod)
+  # Example: "k8s,prod" for Kubernetes production
   - name: SPRING_PROFILES_ACTIVE
-    value: "k8s"
+    value: "k8s,{{ .Values.application.environment }}"
   - name: SERVER_PORT
     value: "8080"
   - name: SPRING_DATASOURCE_URL
