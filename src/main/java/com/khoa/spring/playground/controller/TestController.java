@@ -24,6 +24,8 @@ public class TestController {
 	 * This endpoint is idempotent - if called with the same X-Request-ID header,
 	 * it will return the same cached response instead of generating a new random number.
 	 *
+	 * Uses HTTP header-based idempotency key (backward compatible approach).
+	 *
 	 * @param requestId Optional idempotency key from X-Request-ID header
 	 * @return Response containing the request ID and random number
 	 */
@@ -39,6 +41,38 @@ public class TestController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("requestId", requestId);
 		response.put("randomNumber", randomNumber);
+		response.put("method", "header-based");
+
+		return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * Test endpoint demonstrating custom key generation using SpEL expression.
+	 * The idempotency key is generated from method parameters (userId + action).
+	 *
+	 * Example: GET /api/test/random/user123?action=generate
+	 * Idempotency key will be: "user123-generate"
+	 *
+	 * @param userId The user ID from path variable
+	 * @param action The action from query parameter
+	 * @return Response containing user ID, action, and random number
+	 */
+	@Idempotent(key = "#userId + '-' + #action", ttl = 300)
+	@GetMapping("/random/{userId}")
+	public ResponseEntity<Map<String, Object>> getRandomNumberWithCustomKey(
+			@org.springframework.web.bind.annotation.PathVariable String userId,
+			@org.springframework.web.bind.annotation.RequestParam(defaultValue = "generate") String action) {
+
+		int randomNumber = random.nextInt(1000);
+
+		log.info("Custom key endpoint called - UserID: {}, Action: {}, RandomNumber: {}", userId, action,
+				randomNumber);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("userId", userId);
+		response.put("action", action);
+		response.put("randomNumber", randomNumber);
+		response.put("method", "SpEL-based");
 
 		return ResponseEntity.ok(response);
 	}
