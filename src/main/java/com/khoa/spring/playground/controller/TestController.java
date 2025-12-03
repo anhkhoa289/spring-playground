@@ -32,7 +32,9 @@ public class TestController {
 	 */
 	@Idempotent(key = "#requestId", ttl = 300)
 	@GetMapping("/random")
-	public ResponseEntity<Map<String, Object>> getRandomNumber(@RequestParam(required = false) String requestId) {
+	public ResponseEntity<Map<String, Object>> getRandomNumber(
+            @RequestParam(required = false) String requestId
+    ) {
 
 		int randomNumber = random.nextInt(1000);
 
@@ -58,8 +60,10 @@ public class TestController {
 	 */
 	@Idempotent(key = "#userId + '-' + #action", ttl = 300)
 	@GetMapping("/random/{userId}")
-	public ResponseEntity<Map<String, Object>> getRandomNumberWithCustomKey(@PathVariable String userId,
-			@RequestParam(defaultValue = "generate") String action) {
+	public ResponseEntity<Map<String, Object>> getRandomNumberWithCustomKey(
+            @PathVariable String userId,
+			@RequestParam(defaultValue = "generate") String action
+    ) {
 
 		int randomNumber = random.nextInt(1000);
 
