@@ -64,6 +64,8 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				// Public endpoints - authentication not required
 				.requestMatchers("/api/auth/**").permitAll()
+				.requestMatchers("/api/manager-auth/**").permitAll()
+				.requestMatchers("/api/role-test/public").permitAll()
 				.requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
 				.requestMatchers("/actuator/prometheus").permitAll()
 
