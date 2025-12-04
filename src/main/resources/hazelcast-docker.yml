@@ -1,4 +1,5 @@
 hazelcast:
+  cluster-name: hazelcast-docker-cluster
   instance-name: hazelcast-instance
 
   jet:

@@ -1,4 +1,5 @@
 hazelcast:
+  cluster-name: hazelcast-k8s-cluster
   instance-name: hazelcast-instance
 
   jet:

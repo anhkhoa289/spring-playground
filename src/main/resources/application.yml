@@ -24,9 +24,6 @@ spring:
   cache:
     type: ${CACHE_TYPE:hazelcast}
 
-  hazelcast:
-    config: classpath:hazelcast.yml
-
 server:
   port: ${SERVER_PORT:8080}
 
