@@ -22,11 +22,9 @@ import java.util.Arrays;
 @AllArgsConstructor
 public class HazelcastConfig {
 
-    private Environment environment;
-
 	@Bean
-	public Config hazelcastConfiguration() throws IOException {
-		String configFile = getHazelcastConfigFile();
+	public Config hazelcastConfiguration(Environment environment) throws IOException {
+		String configFile = getHazelcastConfigFile(environment);
 		log.info("Loading Hazelcast configuration from: {}", configFile);
 
 		ClassPathResource resource = new ClassPathResource(configFile);
@@ -45,9 +43,10 @@ public class HazelcastConfig {
 	 * - docker profile: hazelcast-docker.yml (Docker Compose)
 	 * - k8s profile: hazelcast-k8s.yml (Kubernetes discovery)
 	 * - ecs profile: hazelcast-ecs.yml (AWS ECS/EC2 discovery)
+	 * - ecs profile: hazelcast-test.yml (testing)
 	 * - default: hazelcast.yml (Local development)
 	 */
-	private String getHazelcastConfigFile() {
+	private String getHazelcastConfigFile(Environment environment) {
 		String[] activeProfiles = environment.getActiveProfiles();
 		log.debug("Active Spring profiles: {}", Arrays.toString(activeProfiles));
 
