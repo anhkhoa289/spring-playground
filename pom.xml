@@ -31,6 +31,7 @@
         <hazelcast.version>5.6.0</hazelcast.version>
         <hazelcast.aws.version>3.4</hazelcast.aws.version>
         <hazelcast.kubernetes.version>2.2.3</hazelcast.kubernetes.version>
+        <keycloak.version>26.1.0</keycloak.version>
     </properties>
 
     <distributionManagement>
@@ -128,6 +129,20 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <!-- Keycloak Authorization Client -->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-authz-client</artifactId>
+            <version>${keycloak.version}</version>
+        </dependency>
+
+        <!-- Keycloak Admin Client -->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
 
         <!-- H2 Database for Testing -->

@@ -65,3 +65,14 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:TRACE}
 #  pattern:
 #    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+# Keycloak Configuration
+keycloak:
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8090}
+  realm: ${KEYCLOAK_REALM:playground}
+  resource: ${KEYCLOAK_CLIENT_ID:spring-playground-client}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:changeme}
+  admin:
+    username: ${KEYCLOAK_ADMIN_USERNAME:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
