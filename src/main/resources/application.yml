@@ -24,6 +24,14 @@ spring:
   cache:
     type: ${CACHE_TYPE:hazelcast}
 
+  # Spring Security OAuth2 Resource Server Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8090}/realms/${KEYCLOAK_REALM:playground}
+          jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8090}/realms/${KEYCLOAK_REALM:playground}/protocol/openid-connect/certs
+
 keycloak:
   auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8090}
   realm: ${KEYCLOAK_REALM:playground}
