@@ -16,10 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests profile-based Hazelcast instance creation and configuration loading.
  */
 @Execution(ExecutionMode.SAME_THREAD)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HazelcastConfigTest {
 
 	@AfterAll
-	static void tearDownAll() {
+	void tearDownAll() {
 		// Ensure all Hazelcast instances are shutdown after all tests
 		Hazelcast.shutdownAll();
 	}
@@ -28,17 +29,12 @@ class HazelcastConfigTest {
 	@SpringBootTest
 	@ActiveProfiles("test")
 	@DisplayName("Test Profile Configuration")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 	class TestProfileTests {
 
 		@Autowired
 		private HazelcastInstance hazelcastInstance;
-
-		@AfterEach
-		void tearDown() {
-			if (hazelcastInstance != null && hazelcastInstance.getLifecycleService().isRunning()) {
-				hazelcastInstance.shutdown();
-			}
-		}
 
 		@Test
 		void hazelcastInstance_ShouldLoadTestConfiguration() {
@@ -128,14 +124,6 @@ class HazelcastConfigTest {
 
 		private HazelcastInstance instance;
 
-		@AfterEach
-		void tearDown() {
-			if (instance != null && instance.getLifecycleService().isRunning()) {
-				instance.shutdown();
-			}
-			Hazelcast.shutdownAll();
-		}
-
 		@Test
 		void hazelcastInstance_ShouldBeRunningAfterCreation() {
 			// Arrange & Act - Creating instance through Spring context would happen in integration tests
@@ -156,22 +144,19 @@ class HazelcastConfigTest {
 	@SpringBootTest
 	@ActiveProfiles("test")
 	@DisplayName("Hazelcast Distributed Map Operations")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 	class DistributedMapTests {
 
 		@Autowired
 		private HazelcastInstance hazelcastInstance;
 
-		@AfterEach
-		void tearDown() {
-			if (hazelcastInstance != null && hazelcastInstance.getLifecycleService().isRunning()) {
-				hazelcastInstance.shutdown();
-			}
-		}
-
 		@Test
+		@Order(1)
 		void hazelcastInstance_ShouldCreateDistributedMap() {
 			// Arrange & Act
 			var map = hazelcastInstance.getMap("test-map");
+			map.clear(); // Clear any previous data
 
 			// Assert
 			assertNotNull(map);
