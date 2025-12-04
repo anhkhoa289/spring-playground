@@ -36,16 +36,16 @@ public class AuthService {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	@Value("${keycloak.auth-server-url}")
+	@Value("${keycloak.user.auth-server-url}")
 	private String authServerUrl;
 
-	@Value("${keycloak.realm}")
+	@Value("${keycloak.user.realm}")
 	private String realm;
 
-	@Value("${keycloak.client-id}")
+	@Value("${keycloak.user.client-id}")
 	private String clientId;
 
-	@Value("${keycloak.credentials.secret}")
+	@Value("${keycloak.user.credentials.secret}")
 	private String clientSecret;
 
 	/**

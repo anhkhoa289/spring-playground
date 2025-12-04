@@ -14,21 +14,22 @@ import java.util.Collections;
 /**
  * Keycloak configuration for authorization and admin operations
  * Provides AuthzClient for policy enforcement and Keycloak admin client
+ * Uses user Keycloak instance by default
  */
 @Slf4j
 @org.springframework.context.annotation.Configuration
 public class KeycloakConfig {
 
-	@Value("${keycloak.auth-server-url}")
+	@Value("${keycloak.user.auth-server-url}")
 	private String authServerUrl;
 
-	@Value("${keycloak.realm}")
+	@Value("${keycloak.user.realm}")
 	private String realm;
 
-	@Value("${keycloak.client-id}")
+	@Value("${keycloak.user.client-id}")
 	private String clientId;
 
-	@Value("${keycloak.credentials.secret}")
+	@Value("${keycloak.user.credentials.secret}")
 	private String clientSecret;
 
 	/**
@@ -55,8 +56,8 @@ public class KeycloakConfig {
 	 */
 	@Bean
 	public Keycloak keycloakAdminClient(
-            @Value("${keycloak.admin.username}") String adminUsername,
-			@Value("${keycloak.admin.password}") String adminPassword
+            @Value("${keycloak.user.admin.username}") String adminUsername,
+			@Value("${keycloak.user.admin.password}") String adminPassword
     ) {
         log.debug("Creating Keycloak Admin Client");
 		return KeycloakBuilder.builder()
