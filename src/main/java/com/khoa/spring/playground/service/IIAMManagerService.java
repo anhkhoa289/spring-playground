@@ -4,84 +4,85 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Interface for Identity and Access Management (IAM) operations
- * Provides abstraction for user management, roles, and authorization
+ * Interface for Manager Identity and Access Management (IAM) operations
+ * Provides abstraction for manager/admin management, roles, and authorization
+ * Connected to Manager Keycloak instance
  */
-public interface IIAMService {
+public interface IIAMManagerService {
 
 	/**
-	 * Create a new user in the IAM system
+	 * Create a new manager in the IAM system
 	 *
-	 * @param username Username for the new user
-	 * @param email User email address
-	 * @param firstName User first name
-	 * @param lastName User last name
+	 * @param username Username for the new manager
+	 * @param email Manager email address
+	 * @param firstName Manager first name
+	 * @param lastName Manager last name
 	 * @param password Initial password
-	 * @return User ID in the IAM system
+	 * @return Manager ID in the IAM system
 	 */
 	String createUser(String username, String email, String firstName, String lastName, String password);
 
 	/**
-	 * Update user attributes
+	 * Update manager attributes
 	 *
-	 * @param userId User ID
+	 * @param userId Manager ID
 	 * @param attributes Map of attributes to update
 	 */
 	void updateUser(String userId, Map<String, String> attributes);
 
 	/**
-	 * Delete a user from the IAM system
+	 * Delete a manager from the IAM system
 	 *
-	 * @param userId User ID to delete
+	 * @param userId Manager ID to delete
 	 */
 	void deleteUser(String userId);
 
 	/**
-	 * Get user details by ID
+	 * Get manager details by ID
 	 *
-	 * @param userId User ID
-	 * @return Map containing user details
+	 * @param userId Manager ID
+	 * @return Map containing manager details
 	 */
 	Map<String, Object> getUserById(String userId);
 
 	/**
-	 * Get user details by username
+	 * Get manager details by username
 	 *
 	 * @param username Username
-	 * @return Map containing user details
+	 * @return Map containing manager details
 	 */
 	Map<String, Object> getUserByUsername(String username);
 
 	/**
-	 * Assign roles to a user
+	 * Assign roles to a manager
 	 *
-	 * @param userId User ID
+	 * @param userId Manager ID
 	 * @param roleNames List of role names to assign
 	 */
 	void assignRoles(String userId, List<String> roleNames);
 
 	/**
-	 * Remove roles from a user
+	 * Remove roles from a manager
 	 *
-	 * @param userId User ID
+	 * @param userId Manager ID
 	 * @param roleNames List of role names to remove
 	 */
 	void removeRoles(String userId, List<String> roleNames);
 
 	/**
-	 * Get user roles
+	 * Get manager roles
 	 *
-	 * @param userId User ID
+	 * @param userId Manager ID
 	 * @return List of role names
 	 */
 	List<String> getUserRoles(String userId);
 
 	/**
-	 * Check if user has a specific role
+	 * Check if manager has a specific role
 	 *
-	 * @param userId User ID
+	 * @param userId Manager ID
 	 * @param roleName Role name to check
-	 * @return true if user has the role
+	 * @return true if manager has the role
 	 */
 	boolean hasRole(String userId, String roleName);
 
@@ -94,34 +95,34 @@ public interface IIAMService {
 	boolean validateToken(String token);
 
 	/**
-	 * Get user permissions
+	 * Get manager permissions
 	 *
-	 * @param userId User ID
+	 * @param userId Manager ID
 	 * @return List of permissions
 	 */
 	List<String> getUserPermissions(String userId);
 
 	/**
-	 * Check if user has a specific permission
+	 * Check if manager has a specific permission
 	 *
-	 * @param userId User ID
+	 * @param userId Manager ID
 	 * @param permission Permission to check
-	 * @return true if user has the permission
+	 * @return true if manager has the permission
 	 */
 	boolean hasPermission(String userId, String permission);
 
 	/**
-	 * Enable or disable user account
+	 * Enable or disable manager account
 	 *
-	 * @param userId User ID
+	 * @param userId Manager ID
 	 * @param enabled true to enable, false to disable
 	 */
 	void setUserEnabled(String userId, boolean enabled);
 
 	/**
-	 * Reset user password
+	 * Reset manager password
 	 *
-	 * @param userId User ID
+	 * @param userId Manager ID
 	 * @param newPassword New password
 	 */
 	void resetPassword(String userId, String newPassword);

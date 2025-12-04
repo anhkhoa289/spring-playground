@@ -1,5 +1,6 @@
 package com.khoa.spring.playground.service;
 
+import com.khoa.spring.playground.config.UserKeycloakConfig;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -21,26 +22,27 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Keycloak implementation of IAM service
- * Handles user management, roles, and authorization using Keycloak
+ * Keycloak implementation of User IAM service
+ * Handles user management, roles, and authorization using User Keycloak instance
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KeycloakIAMService implements IIAMService {
+public class KeycloakUserIAMService implements IIAMUserService {
 
+	@Qualifier("userKeycloakAdminClient")
 	private final Keycloak keycloakAdminClient;
 
+	@Qualifier("userAuthzClient")
 	private final AuthzClient authzClient;
 
-	@Value("${keycloak.realm}")
-	private String realm;
+	private final UserKeycloakConfig userConfig;
 
 	/**
 	 * Get realm resource for the configured realm
 	 */
 	private RealmResource getRealmResource() {
-		return keycloakAdminClient.realm(realm);
+		return keycloakAdminClient.realm(userConfig.getRealm());
 	}
 
 	/**

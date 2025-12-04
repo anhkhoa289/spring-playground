@@ -30,7 +30,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthService {
 
-	private final IIAMService iamService;
+	private final IIAMUserService iamUserService;
 
 	private final RestTemplate restTemplate = new RestTemplate();
 
@@ -62,7 +62,7 @@ public class AuthService {
 		log.info("Registering new user: {}", username);
 
 		// Create user in Keycloak
-		String userId = iamService.createUser(username, email, firstName, lastName, password);
+		String userId = iamUserService.createUser(username, email, firstName, lastName, password);
 
 		// Login to get token
 		AuthResponse authResponse = login(username, password);
@@ -127,8 +127,8 @@ public class AuthService {
 			String userId = getUserIdFromToken(token);
 
 			// Get user details from Keycloak
-			Map<String, Object> userDetails = iamService.getUserById(userId);
-			List<String> roles = iamService.getUserRoles(userId);
+			Map<String, Object> userDetails = iamUserService.getUserById(userId);
+			List<String> roles = iamUserService.getUserRoles(userId);
 
 			UserResponse userResponse = new UserResponse();
 			userResponse.setId((String) userDetails.get("id"));
