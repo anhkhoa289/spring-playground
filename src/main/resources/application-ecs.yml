@@ -1,8 +1,8 @@
-# AWS ECS profile - minimal overrides
-# Activates when SPRING_PROFILES_ACTIVE=ecs
-# Main configuration is in application.yml
 
-# Enable debug logging for AWS discovery
+spring:
+  hazelcast:
+    config: classpath:hazelcast-ecs.yml
+
 logging:
   level:
     com.hazelcast.aws: DEBUG

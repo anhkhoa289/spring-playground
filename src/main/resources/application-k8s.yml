@@ -1,3 +1,3 @@
-# Kubernetes profile - minimal overrides
-# Activates when SPRING_PROFILES_ACTIVE=k8s
-# Main configuration is in application.yml
+spring:
+  hazelcast:
+    config: classpath:hazelcast-k8s.yml

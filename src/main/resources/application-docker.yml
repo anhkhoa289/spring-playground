@@ -1,5 +1,6 @@
-# Docker Compose profile - minimal overrides
-# Activates when SPRING_PROFILES_ACTIVE=docker
+spring:
+  hazelcast:
+    config: classpath:hazelcast-docker.yml
 
 management:
   tracing:

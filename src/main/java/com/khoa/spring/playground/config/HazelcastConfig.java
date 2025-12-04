@@ -16,11 +16,11 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 @Slf4j
-@Configuration
+//@Configuration
 @ConditionalOnProperty(name = "spring.cache.type", havingValue = "hazelcast")
 public class HazelcastConfig {
 
-	@Bean
+//	@Bean
 	public HazelcastInstance hazelcastInstance(Environment environment) throws IOException {
         String configFile = getHazelcastConfigFile(environment);
         log.info("Loading Hazelcast configuration from: {}", configFile);
