@@ -1,6 +1,9 @@
 hazelcast:
   instance-name: hazelcast-instance
 
+  jet:
+    enabled: true
+
   network:
     port:
       auto-increment: true
@@ -8,11 +11,8 @@ hazelcast:
     join:
       multicast:
         enabled: false
-      # TCP-IP for local development with docker-compose
       tcp-ip:
-        enabled: true
-        member-list:
-          - app
+        enabled: false
       kubernetes:
         enabled: false
       auto-detection:

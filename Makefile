@@ -41,13 +41,6 @@ build-image:
 		-Dspring-boot.build-image.imageName=$(IMAGE_NAME)
 	@echo ""
 	@echo "Image built successfully: $(IMAGE_NAME)"
-	@echo ""
-	@echo "To run the image:"
-	@echo "  docker run -p 8080:8080 \\"
-	@echo "    -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/playground \\"
-	@echo "    -e SPRING_DATASOURCE_USERNAME=postgres \\"
-	@echo "    -e SPRING_DATASOURCE_PASSWORD=postgres \\"
-	@echo "    $(IMAGE_NAME)"
 
 # Start SonarQube service
 sonar-start:

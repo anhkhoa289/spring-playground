@@ -2,7 +2,7 @@ services:
   app:
     image: spring-playground:latest
     deploy:
-      replicas: 2
+      replicas: 3
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/playground
@@ -84,7 +84,6 @@ services:
       - observability
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    restart: unless-stopped
 
   # Grafana Mimir - Metrics storage
   mimir:
@@ -99,7 +98,6 @@ services:
       - mimir-data:/data
     networks:
       - observability
-    restart: unless-stopped
 
   # Grafana - Visualization
   grafana:
@@ -120,7 +118,6 @@ services:
       - observability
     depends_on:
       - mimir
-    restart: unless-stopped
 
 volumes:
   postgres_data:

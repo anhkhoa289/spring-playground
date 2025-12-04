@@ -1,6 +1,9 @@
 hazelcast:
   instance-name: hazelcast-instance
 
+  jet:
+    enabled: true
+
   network:
     port:
       auto-increment: true
@@ -8,10 +11,8 @@ hazelcast:
     join:
       multicast:
         enabled: false
-      # TCP-IP disabled in Kubernetes
       tcp-ip:
         enabled: false
-      # Kubernetes discovery for production
       kubernetes:
         enabled: true
         namespace: ${HAZELCAST_KUBERNETES_NAMESPACE:default}

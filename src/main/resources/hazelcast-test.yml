@@ -1,7 +1,8 @@
-# Hazelcast configuration for tests
-# Runs in standalone mode for isolated testing
 hazelcast:
   instance-name: test-instance
+
+  jet:
+    enabled: true
 
   network:
     port:
