@@ -1,3 +1,7 @@
+management:
+  tracing:
+    enabled: false
+
 logging:
   level:
     com.hazelcast.aws: DEBUG

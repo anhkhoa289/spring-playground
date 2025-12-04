@@ -4,7 +4,8 @@ services:
 #    deploy:
 #      replicas: 3
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+#      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: ecs
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/playground
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -20,7 +21,8 @@ services:
   app-22:
     image: spring-playground:latest
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+#      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: ecs
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/playground
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres

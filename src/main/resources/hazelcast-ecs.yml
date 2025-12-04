@@ -9,7 +9,7 @@ hazelcast:
     rest-api:
       enabled: true
     port:
-      auto-increment: true
+      auto-increment: false
       port: 5701
     join:
       multicast:
@@ -21,18 +21,23 @@ hazelcast:
       aws:
         enabled: true
         # Use IAM role credentials (recommended for ECS tasks)
-        use-public-ip: false
+#        use-public-ip: false
         # Discovery configuration
-        region: ${AWS_REGION:us-east-1}
+#        region: ${AWS_REGION:us-east-1}
         # ECS-specific configuration
-        tag-key: ${HAZELCAST_TAG_KEY:hazelcast-cluster}
-        tag-value: ${HAZELCAST_TAG_VALUE:spring-playground}
+#        tag-key: ${HAZELCAST_TAG_KEY:hazelcast-cluster}
+#        tag-value: ${HAZELCAST_TAG_VALUE:spring-playground}
         # Security group for filtering instances
-        security-group-name: ${HAZELCAST_SECURITY_GROUP:}
+#        security-group-name: ${HAZELCAST_SECURITY_GROUP:}
         # Connection timeout
-        connection-timeout-seconds: 10
+        connection-timeout-seconds: 60
       auto-detection:
         enabled: false
+      interfaces:
+        enabled: true
+        interfaces:
+          - 192.168.148.*
+          - 192.168.163.*
 
   # Cache configurations (same as default)
   map:
