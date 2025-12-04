@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(properties = {"spring.cache.type=hazelcast"})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class TestControllerTest {
@@ -28,7 +28,7 @@ class TestControllerTest {
 	@Autowired
 	private HazelcastInstance hazelcastInstance;
 
-	private IMap<String, IdempotencyResponse> cache;
+	private IMap<Object, Object> cache;
 
 	@BeforeEach
 	void setUp() {
@@ -94,7 +94,7 @@ class TestControllerTest {
 		mockMvc.perform(get("/api/test/random").param("requestId", requestId)).andExpect(status().isOk());
 
 		// Assert
-		IdempotencyResponse cachedResponse = cache.get(requestId);
+		IdempotencyResponse cachedResponse = (IdempotencyResponse) cache.get(requestId);
 		assertNotNull(cachedResponse);
 		assertEquals(200, cachedResponse.getStatusCode());
 		assertNotNull(cachedResponse.getResponseBody());
@@ -196,7 +196,7 @@ class TestControllerTest {
 		mockMvc.perform(get("/api/test/random/" + userId).param("action", action)).andExpect(status().isOk());
 
 		// Assert
-		IdempotencyResponse cachedResponse = cache.get(expectedKey);
+		IdempotencyResponse cachedResponse = (IdempotencyResponse) cache.get(expectedKey);
 		assertNotNull(cachedResponse);
 		assertEquals(200, cachedResponse.getStatusCode());
 		assertNotNull(cachedResponse.getResponseBody());

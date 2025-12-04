@@ -4,6 +4,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.YamlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -18,13 +19,10 @@ import java.util.Arrays;
 @Slf4j
 @Configuration
 @ConditionalOnProperty(name = "spring.cache.type", havingValue = "hazelcast")
+@AllArgsConstructor
 public class HazelcastConfig {
 
-	private final Environment environment;
-
-	public HazelcastConfig(Environment environment) {
-		this.environment = environment;
-	}
+    private Environment environment;
 
 	@Bean
 	public Config hazelcastConfiguration() throws IOException {
@@ -62,6 +60,9 @@ public class HazelcastConfig {
 		else if (Arrays.asList(activeProfiles).contains("ecs")) {
 			return "hazelcast-ecs.yml";
 		}
+        else if (Arrays.asList(activeProfiles).contains("test")) {
+            return "hazelcast-test.yml";
+        }
 		return "hazelcast.yml";
 	}
 

@@ -32,7 +32,7 @@ class IdempotencyAspectTest {
 	private HazelcastInstance hazelcastInstance;
 
 	@Mock
-	private IMap<String, IdempotencyResponse> cache;
+	private IMap<Object, Object> cache;
 
 	@Mock
 	private ProceedingJoinPoint joinPoint;
@@ -48,7 +48,7 @@ class IdempotencyAspectTest {
 	@BeforeEach
 	void setUp() {
 		idempotencyAspect = new IdempotencyAspect(hazelcastInstance);
-		when(hazelcastInstance.getMap("idempotency")).thenReturn(cache);
+		lenient().when(hazelcastInstance.getMap("idempotency")).thenReturn(cache);
 	}
 
 	@Test
@@ -56,7 +56,7 @@ class IdempotencyAspectTest {
 		// Arrange
 		String key = "test-key-123";
 		when(idempotentAnnotation.key()).thenReturn("#requestId");
-		when(idempotentAnnotation.ttl()).thenReturn(300);
+		lenient().when(idempotentAnnotation.ttl()).thenReturn(300);
 
 		Method method = getTestMethod("testMethod", String.class);
 		when(joinPoint.getSignature()).thenReturn(signature);
@@ -194,7 +194,7 @@ class IdempotencyAspectTest {
 		// Arrange
 		String key = "test-key-789";
 		when(idempotentAnnotation.key()).thenReturn("#requestId");
-		when(idempotentAnnotation.ttl()).thenReturn(300);
+		lenient().when(idempotentAnnotation.ttl()).thenReturn(300);
 
 		Method method = getTestMethod("testMethod", String.class);
 		when(joinPoint.getSignature()).thenReturn(signature);
