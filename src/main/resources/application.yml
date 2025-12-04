@@ -41,6 +41,13 @@ keycloak:
   admin:
     username: ${KEYCLOAK_ADMIN_USERNAME:admin}
     password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+  # Secondary Keycloak instance configuration
+  secondary:
+    enabled: ${KEYCLOAK_SECONDARY_ENABLED:false}
+    auth-server-url: ${KEYCLOAK_SECONDARY_AUTH_SERVER_URL:http://localhost:8091}
+    realm: ${KEYCLOAK_SECONDARY_REALM:playground-secondary}
+    issuer-uri: ${KEYCLOAK_SECONDARY_AUTH_SERVER_URL:http://localhost:8091}/realms/${KEYCLOAK_SECONDARY_REALM:playground-secondary}
+    jwk-set-uri: ${KEYCLOAK_SECONDARY_AUTH_SERVER_URL:http://localhost:8091}/realms/${KEYCLOAK_SECONDARY_REALM:playground-secondary}/protocol/openid-connect/certs
 
 server:
   port: ${SERVER_PORT:8080}

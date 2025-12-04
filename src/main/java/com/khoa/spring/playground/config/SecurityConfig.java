@@ -1,8 +1,10 @@
 package com.khoa.spring.playground.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,6 +28,12 @@ public class SecurityConfig {
 
 	@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
 	private String issuerUri;
+
+	@Value("${keycloak.secondary.enabled:false}")
+	private boolean secondaryEnabled;
+
+	@Value("${keycloak.secondary.issuer-uri:}")
+	private String secondaryIssuerUri;
 
 	/**
 	 * Configure security filter chain
@@ -61,12 +69,23 @@ public class SecurityConfig {
 	}
 
 	/**
-	 * JWT Decoder bean for validating tokens with Keycloak
+	 * Primary JWT Decoder bean for validating tokens with primary Keycloak instance
 	 * Uses JWKS (JSON Web Key Set) endpoint from Keycloak
 	 */
-	@Bean
+	@Bean(name = "primaryJwtDecoder")
+	@Primary
 	public JwtDecoder jwtDecoder() {
 		return NimbusJwtDecoder.withIssuerLocation(issuerUri).build();
+	}
+
+	/**
+	 * Secondary JWT Decoder bean for validating tokens with secondary Keycloak instance
+	 * Only enabled when keycloak.secondary.enabled=true
+	 */
+	@Bean(name = "secondaryJwtDecoder")
+	@ConditionalOnProperty(name = "keycloak.secondary.enabled", havingValue = "true")
+	public JwtDecoder secondaryJwtDecoder() {
+		return NimbusJwtDecoder.withIssuerLocation(secondaryIssuerUri).build();
 	}
 
 	/**
