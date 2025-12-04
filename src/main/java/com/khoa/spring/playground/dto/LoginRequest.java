@@ -15,7 +15,7 @@ public class LoginRequest {
 	/**
 	 * Username or email
 	 */
-	private String username;
+	private String email;
 
 	/**
 	 * User password

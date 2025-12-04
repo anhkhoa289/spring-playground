@@ -40,10 +40,6 @@ public class AuthController {
 		log.info("Registration request received for username: {}", request.getUsername());
 
 		try {
-			// Validate request
-			if (request.getUsername() == null || request.getUsername().isEmpty()) {
-				return ResponseEntity.badRequest().build();
-			}
 			if (request.getPassword() == null || request.getPassword().isEmpty()) {
 				return ResponseEntity.badRequest().build();
 			}
@@ -51,8 +47,13 @@ public class AuthController {
 				return ResponseEntity.badRequest().build();
 			}
 
-			AuthResponse response = authService.register(request.getUsername(), request.getEmail(),
-					request.getFirstName(), request.getLastName(), request.getPassword());
+			AuthResponse response = authService.register(
+                    request.getEmail(),
+                    request.getEmail(),
+					request.getFirstName(),
+                    request.getLastName(),
+                    request.getPassword()
+            );
 
 			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 		}
@@ -71,23 +72,23 @@ public class AuthController {
 	 */
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-		log.info("Login request received for username: {}", request.getUsername());
+		log.info("Login request received for username: {}", request.getEmail());
 
 		try {
 			// Validate request
-			if (request.getUsername() == null || request.getUsername().isEmpty()) {
+			if (request.getEmail() == null || request.getEmail().isEmpty()) {
 				return ResponseEntity.badRequest().build();
 			}
 			if (request.getPassword() == null || request.getPassword().isEmpty()) {
 				return ResponseEntity.badRequest().build();
 			}
 
-			AuthResponse response = authService.login(request.getUsername(), request.getPassword());
+			AuthResponse response = authService.login(request.getEmail(), request.getPassword());
 
 			return ResponseEntity.ok(response);
 		}
 		catch (Exception e) {
-			log.error("Login failed for username: {}", request.getUsername(), e);
+			log.error("Login failed for username: {}", request.getEmail(), e);
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 	}
