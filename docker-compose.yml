@@ -53,7 +53,6 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
-    container_name: keycloak
     command: start-dev
     environment:
       KEYCLOAK_ADMIN: admin
@@ -64,7 +63,7 @@ services:
       KC_METRICS_ENABLED: true
       KC_HEALTH_ENABLED: true
     ports:
-      - "8090:8080"
+      - "8180:8080"
     networks:
       - spring-network
     healthcheck:
