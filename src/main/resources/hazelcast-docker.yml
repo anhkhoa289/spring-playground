@@ -6,6 +6,8 @@ hazelcast:
     enabled: true
 
   network:
+    rest-api:
+      enabled: true
     port:
       auto-increment: false
       port: 5701
