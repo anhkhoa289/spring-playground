@@ -1,5 +1,5 @@
 # Default values for spring-playground
-replicaCount: 1
+replicaCount: 2
 
 image:
   repository: spring-playground
@@ -78,8 +78,9 @@ application:
 
 # Spring Boot environment variables
 env:
+  # Use k8s profile for Kubernetes deployment
   - name: SPRING_PROFILES_ACTIVE
-    value: "production"
+    value: "k8s"
   - name: SERVER_PORT
     value: "8080"
   - name: SPRING_DATASOURCE_URL
@@ -95,6 +96,13 @@ env:
     value: "update"
   - name: SPRING_CACHE_TYPE
     value: "hazelcast"
+  # Hazelcast Kubernetes discovery configuration (used by hazelcast-k8s.yml)
+  - name: HAZELCAST_KUBERNETES_NAMESPACE
+    value: "{{ .Release.Namespace }}"
+  - name: HAZELCAST_KUBERNETES_SERVICE_NAME
+    value: "{{ include \"spring-playground.fullname\" . }}"
+  - name: HAZELCAST_KUBERNETES_SERVICE_LABEL
+    value: "{{ include \"spring-playground.name\" . }}"
 
 # Liveness and readiness probes
 livenessProbe:
@@ -134,25 +142,7 @@ postgresql:
       cpu: 250m
       memory: 256Mi
 
-# ConfigMap for additional configuration
+# ConfigMap for additional configuration (disabled - using application-k8s.yml from classpath)
 configMap:
-  enabled: true
-  data:
-    application.yml: |
-      spring:
-        application:
-          name: playground
-        jpa:
-          hibernate:
-            ddl-auto: update
-          show-sql: false
-          properties:
-            hibernate:
-              dialect: org.hibernate.dialect.PostgreSQLDialect
-              format_sql: true
-          database-platform: org.hibernate.dialect.PostgreSQLDialect
-        cache:
-          type: hazelcast
-      logging:
-        level:
-          com.khoa.spring.playground: INFO
+  enabled: false
+  data: {}

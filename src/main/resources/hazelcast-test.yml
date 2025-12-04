@@ -1,0 +1,40 @@
+hazelcast:
+  cluster-name: hazelcast-test-cluster
+  instance-name: test-instance
+
+  jet:
+    enabled: true
+
+  network:
+    rest-api:
+      enabled: true
+    port:
+      auto-increment: true
+      port: 5702
+    join:
+      multicast:
+        enabled: false
+      tcp-ip:
+        enabled: false
+      kubernetes:
+        enabled: false
+      auto-detection:
+        enabled: false
+
+  # Cache configurations matching main config
+  map:
+    users:
+      time-to-live-seconds: 300
+      max-idle-seconds: 150
+    posts:
+      time-to-live-seconds: 300
+      max-idle-seconds: 150
+    favorites:
+      time-to-live-seconds: 300
+      max-idle-seconds: 150
+    resources:
+      time-to-live-seconds: 300
+      max-idle-seconds: 150
+    idempotency:
+      time-to-live-seconds: 300
+      max-idle-seconds: 150

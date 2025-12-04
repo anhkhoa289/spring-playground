@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: test
+
   datasource:
     url: jdbc:h2:mem:testdb
     driverClassName: org.h2.Driver
@@ -15,9 +18,10 @@ spring:
         format_sql: true
 
   cache:
-    # Using 'none' to completely disable caching in tests
-    # This prevents Hazelcast from loading
-    type: none
+    type: hazelcast
+
+  hazelcast:
+    config: classpath:hazelcast-test.yml
 
 logging:
   level:

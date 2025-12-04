@@ -1,7 +1,26 @@
 services:
   app:
     image: spring-playground:latest
+#    deploy:
+#      replicas: 3
     environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/playground
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080"  # Docker sẽ tự động map tới port random trên host
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - spring-network
+      - observability
+
+  app-22:
+    image: spring-playground:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/playground
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -81,7 +100,6 @@ services:
       - observability
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    restart: unless-stopped
 
   # Grafana Mimir - Metrics storage
   mimir:
@@ -96,7 +114,6 @@ services:
       - mimir-data:/data
     networks:
       - observability
-    restart: unless-stopped
 
   # Grafana - Visualization
   grafana:
@@ -117,7 +134,6 @@ services:
       - observability
     depends_on:
       - mimir
-    restart: unless-stopped
 
 volumes:
   postgres_data:

@@ -1,26 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
-        <relativePath/>
+        <version>3.5.8</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
-
     <groupId>com.khoa.spring</groupId>
     <artifactId>playground</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>playground</name>
     <description>Play with Spring Boot</description>
-
+    <url/>
+    <licenses>
+        <license/>
+    </licenses>
+    <developers>
+        <developer/>
+    </developers>
+    <scm>
+        <connection/>
+        <developerConnection/>
+        <tag/>
+        <url/>
+    </scm>
     <properties>
         <java.version>21</java.version>
-        <hazelcast.version>5.4.0</hazelcast.version>
+        <hazelcast.version>5.6.0</hazelcast.version>
+        <hazelcast.aws.version>3.4</hazelcast.aws.version>
+        <hazelcast.kubernetes.version>2.2.3</hazelcast.kubernetes.version>
     </properties>
 
     <distributionManagement>
@@ -32,17 +42,27 @@
     </distributionManagement>
 
     <dependencies>
-        <!-- Spring Boot Starter Web (Spring MVC) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-hazelcast</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Spring Boot Starter Data JPA -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
 
         <!-- PostgreSQL Driver -->
         <dependency>
@@ -57,18 +77,27 @@
             <artifactId>hazelcast</artifactId>
             <version>${hazelcast.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast-spring</artifactId>
             <version>${hazelcast.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.hazelcast</groupId>-->
+<!--            <artifactId>hazelcast-aws</artifactId>-->
+<!--            <version>${hazelcast.aws.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.hazelcast</groupId>-->
+<!--            <artifactId>hazelcast-kubernetes</artifactId>-->
+<!--            <version>${hazelcast.kubernetes.version}</version>-->
+<!--        </dependency>-->
 
-        <!-- Spring Boot Cache Support -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
+        <!-- Spring Boot AOP -->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-aop</artifactId>-->
+<!--        </dependency>-->
 
         <!-- Spring Boot Actuator -->
         <dependency>
@@ -101,17 +130,16 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring Boot Starter Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- H2 Database for Testing -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

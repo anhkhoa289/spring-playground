@@ -1,5 +1,5 @@
 hazelcast:
-  cluster-name: hazelcast-dev-cluster
+  cluster-name: hazelcast-ecs-cluster
   instance-name: hazelcast-instance
 
   jet:
@@ -18,10 +18,23 @@ hazelcast:
         enabled: false
       kubernetes:
         enabled: false
+      aws:
+        enabled: true
+        # Use IAM role credentials (recommended for ECS tasks)
+        use-public-ip: false
+        # Discovery configuration
+        region: ${AWS_REGION:us-east-1}
+        # ECS-specific configuration
+        tag-key: ${HAZELCAST_TAG_KEY:hazelcast-cluster}
+        tag-value: ${HAZELCAST_TAG_VALUE:spring-playground}
+        # Security group for filtering instances
+        security-group-name: ${HAZELCAST_SECURITY_GROUP:}
+        # Connection timeout
+        connection-timeout-seconds: 10
       auto-detection:
         enabled: false
 
-  # Cache configurations
+  # Cache configurations (same as default)
   map:
     users:
       time-to-live-seconds: 3600

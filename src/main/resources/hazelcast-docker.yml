@@ -1,5 +1,5 @@
 hazelcast:
-  cluster-name: hazelcast-dev-cluster
+  cluster-name: hazelcast-docker-cluster
   instance-name: hazelcast-instance
 
   jet:
@@ -9,14 +9,20 @@ hazelcast:
     rest-api:
       enabled: true
     port:
-      auto-increment: true
+      auto-increment: false
       port: 5701
     join:
       multicast:
         enabled: false
       tcp-ip:
-        enabled: false
+        enabled: true
+        member-list:
+          - app  # Service name in docker-compose
+          - app-22
+        connection-timeout-seconds: 30
       kubernetes:
+        enabled: false
+      aws:
         enabled: false
       auto-detection:
         enabled: false

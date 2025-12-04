@@ -1,5 +1,5 @@
 hazelcast:
-  cluster-name: hazelcast-dev-cluster
+  cluster-name: hazelcast-k8s-cluster
   instance-name: hazelcast-instance
 
   jet:
@@ -17,11 +17,15 @@ hazelcast:
       tcp-ip:
         enabled: false
       kubernetes:
-        enabled: false
+        enabled: true
+        namespace: ${HAZELCAST_KUBERNETES_NAMESPACE:default}
+        service-name: ${HAZELCAST_KUBERNETES_SERVICE_NAME:spring-playground}
+        service-label-name: app.kubernetes.io/name
+        service-label-value: ${HAZELCAST_KUBERNETES_SERVICE_LABEL:spring-playground}
       auto-detection:
         enabled: false
 
-  # Cache configurations
+  # Cache configurations (same as default)
   map:
     users:
       time-to-live-seconds: 3600
