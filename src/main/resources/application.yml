@@ -64,4 +64,5 @@ logging:
     org.hibernate.SQL: ${LOG_LEVEL_SQL:DEBUG}
     org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:TRACE}
   pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+#    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+    level: "%5p [%X{traceId:-},%X{spanId:-}]"
