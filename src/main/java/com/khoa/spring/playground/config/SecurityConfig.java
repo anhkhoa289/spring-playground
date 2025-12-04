@@ -3,12 +3,12 @@ package com.khoa.spring.playground.config;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -87,7 +87,7 @@ public class SecurityConfig {
 			@Value("${keycloak.user.issuer-uri}") String userIssuerUri,
 			@Value("${keycloak.manager.issuer-uri:}") String managerIssuerUri,
 			@Qualifier("userJwtDecoder") JwtDecoder userJwtDecoder,
-			@Qualifier("managerJwtDecoder") @org.springframework.beans.factory.annotation.Autowired(required = false) JwtDecoder managerJwtDecoder) {
+			@Qualifier("managerJwtDecoder") @Autowired(required = false) JwtDecoder managerJwtDecoder) {
 		return request -> {
 			String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 			String token = authHeader != null ? authHeader.replace("Bearer ", "") : "";
