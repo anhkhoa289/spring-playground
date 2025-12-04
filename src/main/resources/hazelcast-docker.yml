@@ -16,6 +16,7 @@ hazelcast:
         enabled: true
         member-list:
           - app  # Service name in docker-compose
+          - app-22
         connection-timeout-seconds: 30
       kubernetes:
         enabled: false

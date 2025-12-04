@@ -1,8 +1,24 @@
 services:
   app:
     image: spring-playground:latest
-    deploy:
-      replicas: 3
+#    deploy:
+#      replicas: 3
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/playground
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080"  # Docker sẽ tự động map tới port random trên host
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - spring-network
+      - observability
+
+  app-22:
+    image: spring-playground:latest
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/playground
