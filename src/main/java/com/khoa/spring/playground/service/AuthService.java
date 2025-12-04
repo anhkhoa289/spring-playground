@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.khoa.spring.playground.dto.AuthResponse;
 import com.khoa.spring.playground.dto.UserResponse;
+import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Base64;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -150,7 +150,7 @@ public class AuthService {
 	}
 
 	/**
-	 * Extract user ID from JWT token
+	 * Extract user ID from JWT token using Nimbus JWT library
 	 */
 	private String getUserIdFromToken(String token) {
 		try {
@@ -159,22 +159,25 @@ public class AuthService {
 				token = token.substring(7);
 			}
 
-			// Parse JWT token (format: header.payload.signature)
-			String[] parts = token.split("\\.");
-			if (parts.length != 3) {
-				throw new RuntimeException("Invalid JWT token format");
+			// Parse JWT token using Nimbus
+			SignedJWT signedJWT = SignedJWT.parse(token);
+
+			// Extract subject (user ID) from JWT claims
+			String userId = signedJWT.getJWTClaimsSet().getSubject();
+
+			if (userId == null || userId.isEmpty()) {
+				throw new RuntimeException("Token does not contain subject claim");
 			}
 
-			// Decode payload (base64url)
-			String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
-			JsonNode jsonNode = objectMapper.readTree(payload);
-
-			// Extract subject (user ID)
-			return jsonNode.get("sub").asText();
+			return userId;
+		}
+		catch (ParseException e) {
+			log.error("Failed to parse JWT token", e);
+			throw new RuntimeException("Invalid JWT token format", e);
 		}
 		catch (Exception e) {
-			log.error("Failed to parse token", e);
-			throw new RuntimeException("Failed to parse token", e);
+			log.error("Failed to extract user ID from token", e);
+			throw new RuntimeException("Failed to extract user ID from token", e);
 		}
 	}
 
