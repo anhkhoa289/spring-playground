@@ -33,11 +33,11 @@ hazelcast:
         connection-timeout-seconds: 60
       auto-detection:
         enabled: false
+    interfaces:
+      enabled: true
       interfaces:
-        enabled: true
-        interfaces:
-          - 192.168.148.*
-          - 192.168.163.*
+        - 192.168.148.*
+        - 192.168.163.*
 
   # Cache configurations (same as default)
   map:
