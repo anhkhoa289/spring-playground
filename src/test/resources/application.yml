@@ -20,9 +20,6 @@ spring:
   cache:
     type: hazelcast
 
-  hazelcast:
-    config: classpath:hazelcast-test.yml
-
 logging:
   level:
     org.hibernate.SQL: DEBUG

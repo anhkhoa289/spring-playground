@@ -1,6 +1,6 @@
 include scripts/requests.mk
 
-.PHONY: help install run build-image sonar-start sonar-stop sonar-token sonar-scan clean
+.PHONY: help install run run-ecs build-image sonar-start sonar-stop sonar-token sonar-scan clean
 
 # Variables
 SONAR_HOST_URL := http://localhost:9000
@@ -16,6 +16,7 @@ help:
 	@echo "Available targets:"
 	@echo "  install        - Clean and install project without running tests"
 	@echo "  run            - Run the Spring Boot application"
+	@echo "  run-ecs        - Run the Spring Boot application with ECS profile"
 	@echo "  build-image    - Build Docker image using Spring Boot buildpacks"
 	@echo "  sonar-start    - Start SonarQube container"
 	@echo "  sonar-stop     - Stop SonarQube container"
@@ -33,6 +34,13 @@ install:
 run:
 	@echo "Starting Spring Boot application..."
 	./mvnw spring-boot:run
+
+# Run the Spring Boot application with ECS profile
+run-ecs:
+	@echo "Starting Spring Boot application with ECS profile..."
+	./mvnw spring-boot:run -Dspring-boot.run.profiles=ecs
+
+
 
 # Build Docker image using Spring Boot buildpacks
 build-image:

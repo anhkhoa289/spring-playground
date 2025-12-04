@@ -1,3 +1,23 @@
+spring:
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  cache:
+    type: hazelcast
+
 management:
   tracing:
     enabled: false
@@ -5,3 +25,4 @@ management:
 logging:
   level:
     com.hazelcast.aws: DEBUG
+    org.hibernate.SQL: DEBUG
