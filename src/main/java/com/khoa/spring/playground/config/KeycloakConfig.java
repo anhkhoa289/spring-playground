@@ -1,5 +1,6 @@
 package com.khoa.spring.playground.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -8,13 +9,13 @@ import org.keycloak.authorization.client.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 
 /**
  * Keycloak configuration for authorization and admin operations
  * Provides AuthzClient for policy enforcement and Keycloak admin client
  */
+@Slf4j
 @org.springframework.context.annotation.Configuration
 public class KeycloakConfig {
 
@@ -24,7 +25,7 @@ public class KeycloakConfig {
 	@Value("${keycloak.realm}")
 	private String realm;
 
-	@Value("${keycloak.resource}")
+	@Value("${keycloak.client-id}")
 	private String clientId;
 
 	@Value("${keycloak.credentials.secret}")
@@ -36,10 +37,14 @@ public class KeycloakConfig {
 	 */
 	@Bean
 	public AuthzClient authzClient() {
-		Map<String, Object> credentials = new HashMap<>();
-		credentials.put("secret", clientSecret);
-
-		Configuration configuration = new Configuration(authServerUrl, realm, clientId, credentials, null);
+        log.debug("Creating Keycloak AuthzClient");
+		Configuration configuration = new Configuration(
+                authServerUrl,
+                realm,
+                clientId,
+                Collections.singletonMap("secret", clientSecret),
+                null
+        );
 
 		return AuthzClient.create(configuration);
 	}
@@ -49,9 +54,11 @@ public class KeycloakConfig {
 	 * Requires admin credentials to access Keycloak Admin REST API
 	 */
 	@Bean
-	public Keycloak keycloakAdminClient(@Value("${keycloak.admin.username}") String adminUsername,
-			@Value("${keycloak.admin.password}") String adminPassword) {
-
+	public Keycloak keycloakAdminClient(
+            @Value("${keycloak.admin.username}") String adminUsername,
+			@Value("${keycloak.admin.password}") String adminPassword
+    ) {
+        log.debug("Creating Keycloak Admin Client");
 		return KeycloakBuilder.builder()
 			.serverUrl(authServerUrl)
 			.realm("master")
