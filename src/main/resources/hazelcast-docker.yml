@@ -6,7 +6,7 @@ hazelcast:
 
   network:
     port:
-      auto-increment: true
+      auto-increment: false
       port: 5701
     join:
       multicast:
@@ -15,16 +15,13 @@ hazelcast:
         enabled: true
         member-list:
           - app  # Service name in docker-compose
+        connection-timeout-seconds: 30
       kubernetes:
         enabled: false
       aws:
         enabled: false
       auto-detection:
         enabled: false
-    interfaces:
-      enabled: true
-      interfaces:
-        - 192.168.148.*
 
   # Cache configurations
   map:
