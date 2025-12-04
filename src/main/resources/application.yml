@@ -24,6 +24,35 @@ spring:
   cache:
     type: ${CACHE_TYPE:hazelcast}
 
+# Keycloak Configuration
+keycloak:
+  # User Keycloak instance - for regular users
+  user:
+    auth-server-url: ${KEYCLOAK_USER_AUTH_SERVER_URL:http://localhost:8090}
+    realm: ${KEYCLOAK_USER_REALM:playground}
+    client-id: ${KEYCLOAK_USER_CLIENT_ID:spring-playground-client}
+    issuer-uri: ${KEYCLOAK_USER_AUTH_SERVER_URL:http://localhost:8090}/realms/${KEYCLOAK_USER_REALM:playground}
+    jwk-set-uri: ${KEYCLOAK_USER_AUTH_SERVER_URL:http://localhost:8090}/realms/${KEYCLOAK_USER_REALM:playground}/protocol/openid-connect/certs
+    credentials:
+      secret: ${KEYCLOAK_USER_CLIENT_SECRET:changeme}
+    admin:
+      username: ${KEYCLOAK_USER_ADMIN_USERNAME:admin}
+      password: ${KEYCLOAK_USER_ADMIN_PASSWORD:admin}
+
+  # Manager Keycloak instance - for managers/admins
+  manager:
+    enabled: ${KEYCLOAK_MANAGER_ENABLED:false}
+    auth-server-url: ${KEYCLOAK_MANAGER_AUTH_SERVER_URL:http://localhost:8091}
+    realm: ${KEYCLOAK_MANAGER_REALM:playground-manager}
+    client-id: ${KEYCLOAK_MANAGER_CLIENT_ID:spring-playground-manager-client}
+    issuer-uri: ${KEYCLOAK_MANAGER_AUTH_SERVER_URL:http://localhost:8091}/realms/${KEYCLOAK_MANAGER_REALM:playground-manager}
+    jwk-set-uri: ${KEYCLOAK_MANAGER_AUTH_SERVER_URL:http://localhost:8091}/realms/${KEYCLOAK_MANAGER_REALM:playground-manager}/protocol/openid-connect/certs
+    credentials:
+      secret: ${KEYCLOAK_MANAGER_CLIENT_SECRET:changeme}
+    admin:
+      username: ${KEYCLOAK_MANAGER_ADMIN_USERNAME:admin}
+      password: ${KEYCLOAK_MANAGER_ADMIN_PASSWORD:admin}
+
 server:
   port: ${SERVER_PORT:8080}
 
@@ -52,6 +81,7 @@ management:
       percentiles-histogram:
         http.server.requests: true
   tracing:
+    enabled: ${TRACING_ENABLED:true}
     sampling:
       probability: 1.0
   zipkin:

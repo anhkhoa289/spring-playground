@@ -1,0 +1,269 @@
+###
+# HTTP Requests for Testing Spring Playground API
+# Compatible with VS Code REST Client extension and IntelliJ IDEA HTTP Client
+#
+# Usage:
+# 1. Install REST Client extension in VS Code
+# 2. Click "Send Request" above each request
+# 3. Copy access_token from responses and use in subsequent requests
+###
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+# Variables for tokens - update these after login
+@userToken = your-user-token-here
+@managerToken = your-manager-token-here
+
+###############################################################################
+# User Authentication (User Keycloak)
+###############################################################################
+
+### Register new user
+# @name userRegister
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "user@example.com",
+  "password": "Password123!",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### User login
+# @name userLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+
+### Get current user info
+# Requires: Update @userToken variable with access_token from login response
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{userToken}}
+
+###############################################################################
+# Manager Authentication (Manager Keycloak)
+###############################################################################
+
+### Register new manager
+# @name managerRegister
+POST {{baseUrl}}/api/manager-auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "manager@example.com",
+  "password": "Password123!",
+  "firstName": "Test",
+  "lastName": "Manager"
+}
+
+### Manager login
+# @name managerLogin
+POST {{baseUrl}}/api/manager-auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "manager@example.com",
+  "password": "Password123!"
+}
+
+### Get current manager info
+# Requires: Update @managerToken variable with access_token from login response
+GET {{baseUrl}}/api/manager-auth/me
+Authorization: Bearer {{managerToken}}
+
+###############################################################################
+# Role-Based Access Control Testing
+###############################################################################
+
+### Test public endpoint (no authentication required)
+GET {{baseUrl}}/api/role-test/public
+
+### Test authenticated endpoint
+# Requires: Any valid token (user or manager)
+GET {{baseUrl}}/api/role-test/authenticated
+Authorization: Bearer {{userToken}}
+
+### Test user-only endpoint (requires ROLE_USER)
+# Should succeed with user token, fail with manager token
+GET {{baseUrl}}/api/role-test/user-only
+Authorization: Bearer {{userToken}}
+
+### Test manager-only endpoint (requires ROLE_MANAGER)
+# Should succeed with manager token, fail with user token
+GET {{baseUrl}}/api/role-test/manager-only
+Authorization: Bearer {{managerToken}}
+
+### Test user-or-manager endpoint (requires ROLE_USER or ROLE_MANAGER)
+# Should succeed with either user or manager token
+GET {{baseUrl}}/api/role-test/user-or-manager
+Authorization: Bearer {{userToken}}
+
+### Test admin endpoint (requires both ROLE_USER and ROLE_MANAGER)
+# Will only succeed if user has both roles
+GET {{baseUrl}}/api/role-test/admin
+Authorization: Bearer {{userToken}}
+
+### Get my roles
+# Shows all roles granted to the authenticated user
+GET {{baseUrl}}/api/role-test/my-roles
+Authorization: Bearer {{userToken}}
+
+###############################################################################
+# Cross-Testing (Test Permission Boundaries)
+###############################################################################
+
+### Manager token on user-only endpoint (should return 403 Forbidden)
+GET {{baseUrl}}/api/role-test/user-only
+Authorization: Bearer {{managerToken}}
+
+### User token on manager-only endpoint (should return 403 Forbidden)
+GET {{baseUrl}}/api/role-test/manager-only
+Authorization: Bearer {{userToken}}
+
+###############################################################################
+# Test Scenarios with Different Users
+###############################################################################
+
+### Scenario 1: Register and login as user1
+# @name user1Register
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "user1@example.com",
+  "password": "Password123!",
+  "firstName": "User",
+  "lastName": "One"
+}
+
+###
+# @name user1Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "user1@example.com",
+  "password": "Password123!"
+}
+
+###
+# Use the token from user1Login response
+@user1Token = {{user1Login.response.body.accessToken}}
+
+### Check user1 roles
+GET {{baseUrl}}/api/role-test/my-roles
+Authorization: Bearer {{user1Token}}
+
+###############################################################################
+
+### Scenario 2: Register and login as manager1
+# @name manager1Register
+POST {{baseUrl}}/api/manager-auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "manager1@example.com",
+  "password": "Password123!",
+  "firstName": "Manager",
+  "lastName": "One"
+}
+
+###
+# @name manager1Login
+POST {{baseUrl}}/api/manager-auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "manager1@example.com",
+  "password": "Password123!"
+}
+
+###
+# Use the token from manager1Login response
+@manager1Token = {{manager1Login.response.body.accessToken}}
+
+### Check manager1 roles
+GET {{baseUrl}}/api/role-test/my-roles
+Authorization: Bearer {{manager1Token}}
+
+###############################################################################
+# Actuator Endpoints
+###############################################################################
+
+### Health check
+GET {{baseUrl}}/actuator/health
+
+### Prometheus metrics
+GET {{baseUrl}}/actuator/prometheus
+
+###############################################################################
+# User Management Tests (Existing endpoints)
+###############################################################################
+
+### Get all users (requires authentication)
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{userToken}}
+
+### Get user by ID (replace with actual user ID)
+GET {{baseUrl}}/api/users/1
+Authorization: Bearer {{userToken}}
+
+### Create new user
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+Authorization: Bearer {{userToken}}
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com"
+}
+
+###############################################################################
+# Error Cases Testing
+###############################################################################
+
+### Test with invalid token (should return 401 Unauthorized)
+GET {{baseUrl}}/api/role-test/authenticated
+Authorization: Bearer invalid-token-here
+
+### Test with missing token (should return 401 Unauthorized)
+GET {{baseUrl}}/api/role-test/authenticated
+
+### Test with expired token
+# Copy an expired token here to test token expiration handling
+GET {{baseUrl}}/api/role-test/authenticated
+Authorization: Bearer expired-token-here
+
+###############################################################################
+# Notes:
+#
+# 1. VS Code REST Client Extension:
+#    - Install: "REST Client" by Huachao Mao
+#    - Click "Send Request" above each request
+#    - Variables can be defined with @ syntax
+#    - Response references: {{requestName.response.body.fieldName}}
+#
+# 2. IntelliJ IDEA HTTP Client:
+#    - Built-in support, no extension needed
+#    - Use the same syntax
+#    - Can run from "Run" menu or right-click
+#
+# 3. Variable Usage:
+#    - Update @userToken and @managerToken after login
+#    - Or use named requests and response references
+#    - Example: @token = {{userLogin.response.body.accessToken}}
+#
+# 4. Testing Flow:
+#    a) Register user → Login → Copy access_token → Update @userToken
+#    b) Test user-only endpoints with user token
+#    c) Register manager → Login → Copy access_token → Update @managerToken
+#    d) Test manager-only endpoints with manager token
+#    e) Test cross-permissions (should fail with 403)
+#
+###############################################################################

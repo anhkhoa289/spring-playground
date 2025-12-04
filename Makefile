@@ -1,3 +1,5 @@
+include scripts/requests.mk
+
 .PHONY: help install run build-image sonar-start sonar-stop sonar-token sonar-scan clean
 
 # Variables

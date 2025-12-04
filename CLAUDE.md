@@ -17,7 +17,8 @@ docker-compose up -d
 ```
 
 This starts:
-- PostgreSQL on `localhost:5432`
+- PostgreSQL on `localhost:5435` (mapped from 5432)
+- Keycloak on `localhost:8090` (Admin Console: http://localhost:8090, credentials: admin/admin, uses H2 in-memory database)
 - Hazelcast on `localhost:5701`
 - SonarQube on `localhost:9000`
 - Grafana on `localhost:3000`

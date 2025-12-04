@@ -9,7 +9,7 @@ hazelcast:
     rest-api:
       enabled: true
     port:
-      auto-increment: true
+      auto-increment: false
       port: 5701
     join:
       multicast:
