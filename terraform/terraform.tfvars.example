@@ -1,0 +1,31 @@
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Project Configuration
+project_name = "spring-playground"
+environment  = "dev"
+
+# Network Configuration
+vpc_cidr           = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+# ECS Configuration
+desired_count  = 3
+cpu            = 512    # 0.5 vCPU
+memory         = 1024   # 1 GB
+container_port = 8080
+
+# Health Check
+health_check_path = "/actuator/health"
+
+# Auto Scaling (optional)
+enable_auto_scaling = false
+min_capacity        = 2
+max_capacity        = 6
+
+# Tags
+tags = {
+  Project     = "spring-playground"
+  Environment = "dev"
+  ManagedBy   = "Terraform"
+}
