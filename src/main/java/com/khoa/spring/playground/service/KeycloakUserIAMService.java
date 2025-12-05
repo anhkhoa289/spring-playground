@@ -13,6 +13,8 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "keycloak.user.enabled", havingValue = "true")
+@ConditionalOnBean(UserKeycloakConfig.class)
 public class KeycloakUserIAMService implements IIAMUserService {
 
 	@Qualifier("userKeycloakAdminClient")

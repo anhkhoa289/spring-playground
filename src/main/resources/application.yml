@@ -26,8 +26,8 @@ spring:
 
 # Keycloak Configuration
 keycloak:
-  # User Keycloak instance - for regular users
   user:
+    enabled: ${KEYCLOAK_USER_ENABLED:false}
     auth-server-url: ${KEYCLOAK_USER_AUTH_SERVER_URL:http://localhost:8090}
     realm: ${KEYCLOAK_USER_REALM:playground}
     client-id: ${KEYCLOAK_USER_CLIENT_ID:spring-playground-client}
@@ -39,7 +39,6 @@ keycloak:
       username: ${KEYCLOAK_USER_ADMIN_USERNAME:admin}
       password: ${KEYCLOAK_USER_ADMIN_PASSWORD:admin}
 
-  # Manager Keycloak instance - for managers/admins
   manager:
     enabled: ${KEYCLOAK_MANAGER_ENABLED:false}
     auth-server-url: ${KEYCLOAK_MANAGER_AUTH_SERVER_URL:http://localhost:8091}

@@ -97,7 +97,7 @@ public class SecurityConfig {
 	public AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver(
 			@Value("${keycloak.user.issuer-uri}") String userIssuerUri,
 			@Value("${keycloak.manager.issuer-uri:}") String managerIssuerUri,
-			@Qualifier("userJwtDecoder") JwtDecoder userJwtDecoder,
+			@Qualifier("userJwtDecoder") @Autowired(required = false) JwtDecoder userJwtDecoder,
 			@Qualifier("managerJwtDecoder") @Autowired(required = false) JwtDecoder managerJwtDecoder,
 			@Qualifier("userJwtAuthenticationConverter") JwtAuthenticationConverter userJwtAuthenticationConverter,
 			@Qualifier("managerJwtAuthenticationConverter") JwtAuthenticationConverter managerJwtAuthenticationConverter) {

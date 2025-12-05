@@ -7,6 +7,8 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
@@ -17,6 +19,8 @@ import java.util.Collections;
  * Provides AuthzClient and Admin Client for user Keycloak
  */
 @org.springframework.context.annotation.Configuration
+@ConditionalOnProperty(name = "keycloak.user.enabled", havingValue = "true")
+@ConditionalOnBean(UserKeycloakConfig.class)
 @RequiredArgsConstructor
 @Slf4j
 public class UserKeycloakClientConfig {

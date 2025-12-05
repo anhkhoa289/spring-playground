@@ -1,6 +1,7 @@
 package com.khoa.spring.playground.config;
 
 import lombok.Data;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
  */
 @Configuration
 @ConfigurationProperties(prefix = "keycloak.user")
+@ConditionalOnProperty(name = "keycloak.user.enabled", havingValue = "true")
 @Data
 public class UserKeycloakConfig {
 
