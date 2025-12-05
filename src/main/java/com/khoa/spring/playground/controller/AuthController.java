@@ -7,6 +7,7 @@ import com.khoa.spring.playground.dto.UserResponse;
 import com.khoa.spring.playground.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnBean(AuthService.class)
 public class AuthController {
 
 	private final AuthService authService;

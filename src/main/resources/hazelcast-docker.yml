@@ -16,9 +16,9 @@ hazelcast:
         enabled: false
       tcp-ip:
         enabled: true
-        member-list:
-          - app  # Service name in docker-compose
-          - app-22
+#        member-list:
+#          - app  # Service name in docker-compose
+#          - app-22
         connection-timeout-seconds: 30
       kubernetes:
         enabled: false
@@ -26,6 +26,11 @@ hazelcast:
         enabled: false
       auto-detection:
         enabled: false
+    interfaces:
+      enabled: true
+      interfaces:
+        - 192.168.148.*
+        - 192.168.163.*
 
   # Cache configurations
   map:
