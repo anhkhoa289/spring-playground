@@ -16,9 +16,9 @@ PROJECT_VERSION := 0.0.1-SNAPSHOT
 IMAGE_NAME := spring-playground:latest
 
 # AWS/ECS Variables
-AWS_REGION ?= us-east-1
-ENVIRONMENT ?= dev
-ECR_REPO_NAME ?= $(PROJECT_NAME)-$(ENVIRONMENT)
+AWS_REGION ?= ap-southeast-1
+ENVIRONMENT ?= ecs
+ECR_REPO_NAME ?= $(PROJECT_NAME)
 AWS_ACCOUNT_ID := $(shell aws sts get-caller-identity --query Account --output text 2>/dev/null)
 ECR_REPO_URL := $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(ECR_REPO_NAME)
 GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "local")
