@@ -1,8 +1,21 @@
 services:
-  app:
+  app-hi:
     image: spring-playground:latest
-    deploy:
-      replicas: 2
+#    deploy:
+#      replicas: 2
+    env_file:
+      - .env.local
+    ports:
+      - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - spring-network
+      - observability
+
+  app-hello:
+    image: spring-playground:latest
     env_file:
       - .env.local
     ports:
