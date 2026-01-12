@@ -1,5 +1,6 @@
 package com.khoa.spring.playground.controller;
 
+import com.khoa.spring.playground.annotation.LogExecutionTime;
 import com.khoa.spring.playground.entity.Post;
 import com.khoa.spring.playground.entity.User;
 import com.khoa.spring.playground.repository.PostRepository;
@@ -22,12 +23,14 @@ public class PostController {
     private final UserRepository userRepository;
 
     @GetMapping
+    @LogExecutionTime("Get all posts")
     public ResponseEntity<List<Post>> getAllPosts() {
         return ResponseEntity.ok(postRepository.findAll());
     }
 
     @GetMapping("/{id}")
     @Cacheable(value = "posts", key = "#id")
+    @LogExecutionTime("Get post by ID")
     public ResponseEntity<Post> getPostById(@PathVariable Long id) {
         return postRepository.findById(id)
             .map(ResponseEntity::ok)
@@ -35,17 +38,20 @@ public class PostController {
     }
 
     @GetMapping("/user/{userId}")
+    @LogExecutionTime("Get posts by user ID")
     public ResponseEntity<List<Post>> getPostsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(postRepository.findByUserId(userId));
     }
 
     @GetMapping("/search")
+    @LogExecutionTime("Search posts by title")
     public ResponseEntity<List<Post>> searchPostsByTitle(@RequestParam String title) {
         return ResponseEntity.ok(postRepository.findByTitleContainingIgnoreCase(title));
     }
 
     @PostMapping
     @CacheEvict(value = "posts", allEntries = true)
+    @LogExecutionTime("Create new post")
     public ResponseEntity<Post> createPost(@RequestBody PostRequest request) {
         return userRepository.findById(request.getUserId())
             .map(user -> {
@@ -61,6 +67,7 @@ public class PostController {
 
     @PutMapping("/{id}")
     @CacheEvict(value = "posts", allEntries = true)
+    @LogExecutionTime("Update post")
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
         return postRepository.findById(id)
             .map(existingPost -> {
@@ -83,6 +90,7 @@ public class PostController {
 
     @DeleteMapping("/{id}")
     @CacheEvict(value = "posts", allEntries = true)
+    @LogExecutionTime("Delete post")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         if (postRepository.existsById(id)) {
             postRepository.deleteById(id);
